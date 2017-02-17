@@ -137,26 +137,26 @@
         (any f (cdr xs)))))
 
 (defmacro quasiquote ls
-  (qq 0 (car ls)))
+  (*qq 0 (car ls)))
 
-(defun qq (rank x)
+(defun *qq (rank x)
   (if (cons? x)
     (cond
       [(= (car x) 'unquote)
        (if (= rank 0)
          (cadr x)
-         (list 'list (list 'quote 'unquote) (qq (- rank 1) (cadr x))))]
+         (list 'list (list 'quote 'unquote) (*qq (- rank 1) (cadr x))))]
       [(and (cons? (car x)) (= (caar x) 'unquote-splicing))
        (if (= rank 0)
-         (list 'append2 (cadar x) (qq rank (cdr x)))
-         (list 'cons (list 'list (list 'quote 'unquote-splicing) (qq (- rank 1) (cadar x))) (qq rank (cdr x))))]
+         (list 'append2 (cadar x) (*qq rank (cdr x)))
+         (list 'cons (list 'list (list 'quote 'unquote-splicing) (*qq (- rank 1) (cadar x))) (*qq rank (cdr x))))]
       [(= (car x) 'quasiquote)
-       (list 'list (list 'quote 'quasiquote) (qq (+ rank 1) (cadr x)))]
+       (list 'list (list 'quote 'quasiquote) (*qq (+ rank 1) (cadr x)))]
       [else
-        (list 'cons (qq rank (car x)) (qq rank (cdr x)))])
+        (list 'cons (*qq rank (car x)) (*qq rank (cdr x)))])
     (list 'quote x)))
 
-(defun bind? (x)
+(defun *bind? (x)
   (and (cons? x)
        (cons? (cdr x))
        (nil? (cddr x))
@@ -168,21 +168,21 @@
       `(named-let ,binds ,@body)]
     [(nil? binds)
       `(begin ,@body)]
-    [(not (and (cons? binds) (bind? (car binds))))
+    [(not (and (cons? binds) (*bind? (car binds))))
       (error "Syntax error: expected (let ((id expr)...) body...)")]
     [else
       `((fun (,(caar binds)) (let ,(cdr binds) ,@body))
         ,(cadar binds))]))
 
 (defmacro letrec (binds . body)
-  (if (and (list? binds) (all bind? binds))
+  (if (and (list? binds) (all *bind? binds))
     (let ([vars (map (fun (x) `[,(car x) '()]) binds)]
           [inits (map (fun (x) `(set! ,(car x) ,(cadr x))) binds)])
       `(let ,vars ,@inits ,@body))
     (error "Syntax error: expected (letrec ((id expr)...) body...)")))
 
 (defmacro named-let (sym binds . body)
-  (if (and (list? binds) (all bind? binds))
+  (if (and (list? binds) (all *bind? binds))
     (let ([args (map car binds)])
       `(let ,binds (letrec ([,sym (fun ,args ,@body)]) (,sym ,@args))))
     (error "Syntax error: expected (let sym ((id expr)...) body...)")))
@@ -200,6 +200,32 @@
 
 (defmacro let/cc (k . body)
   `(call/cc (fun (,k) ,@body)))
+
+(defmacro shift (k . body)
+  `(*shift (fun (,k) ,@body)))
+
+(defmacro reset body
+  `(*reset (fun () ,@body)))
+
+(def *cont #f)
+
+(defun *abort (thunk)
+  (let1 v (thunk)
+    (*cont v)))
+
+(defun *reset (thunk)
+  (let1 cont *cont
+    (let/cc k
+      (set! *cont (fun (v)
+                    (set! *cont cont)
+                    (k v)))
+      (*abort thunk))))
+
+(defun *shift (f)
+  (let/cc k
+    (*abort (fun ()
+              (f (fun vs
+                   (reset (apply k vs))))))))
 
 (defbuiltin eval (s))
 (defbuiltin macroexpand (s))
