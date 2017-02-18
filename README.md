@@ -18,26 +18,17 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 
 ```
 (cons a b)
+
 (exit exitcode)
 (error msg)
-(print strs...)
-(println strs...)
-(concat strs...)
-(show x)
+
 (gensym)
-(+ nums...)
-(- num nums...)
-(* nums...)
-(/ num nums...)
-(% num nums...)
-(= xs...)
-(< nums-or-strs...)
-(> nums-or-strs...)
-(<= nums-or-strs...)
-(>= nums-or-strs...)
-(apply f args)
+
 (car cons)
 (cdr cons)
+
+(apply f args)
+
 (num? x)
 (sym? x)
 (str? x)
@@ -45,9 +36,32 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 (nil? x)
 (bool? x)
 (proc? x)
+(meta? x)
+
+(+ nums...)
+(- num nums...)
+(* nums...)
+(/ num nums...)
+(% num nums...)
+
+(concat strs...)
+(length str)
+
+(= xs...)
+(< nums-or-strs...)
+(> nums-or-strs...)
+(<= nums-or-strs...)
+(>= nums-or-strs...)
+
 (call/cc fun)
+
 (eval s)
 (macroexpand s)
 (macroexpand-1 s)
+
+(print strs)
+(newline)
+
+(show x)
 ```
 

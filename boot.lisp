@@ -8,24 +8,10 @@
 (defbuiltin exit (exitcode))
 (defbuiltin error (msg))
 
-(defbuiltin print strs)
-(defbuiltin println strs)
-(defbuiltin concat strs)
-(defbuiltin show (x))
-
 (defbuiltin gensym ())
 
-(defbuiltin + nums)
-(defbuiltin - (num . nums))
-(defbuiltin * nums)
-(defbuiltin / (num . nums))
-(defbuiltin % (num . nums))
-
-(defbuiltin = xs)
-(defbuiltin < nums-or-strs)
-(defbuiltin > nums-or-strs)
-(defbuiltin <= nums-or-strs)
-(defbuiltin >= nums-or-strs)
+(defbuiltin car (cons))
+(defbuiltin cdr (cons))
 
 (defbuiltin apply (f args))
 
@@ -34,9 +20,6 @@
 
 (defun flip (f)
   (fun (a b) (f b a)))
-
-(defbuiltin car (cons))
-(defbuiltin cdr (cons))
 
 (def caar (compose car car))
 (def cadr (compose car cdr))
@@ -58,6 +41,7 @@
 (defbuiltin nil? (x))
 (defbuiltin bool? (x))
 (defbuiltin proc? (x))
+(defbuiltin meta? (x))
 
 (defun list? (x)
   (if (nil? x)
@@ -65,6 +49,21 @@
     (if (cons? x)
       (list? (cdr x))
       #f)))
+
+(defbuiltin + nums)
+(defbuiltin - (num . nums))
+(defbuiltin * nums)
+(defbuiltin / (num . nums))
+(defbuiltin % (num . nums))
+
+(defbuiltin concat strs)
+(defbuiltin length (str)) ; byte size
+
+(defbuiltin = xs)
+(defbuiltin < nums-or-strs)
+(defbuiltin > nums-or-strs)
+(defbuiltin <= nums-or-strs)
+(defbuiltin >= nums-or-strs)
 
 (defun map (f xs)
   (if (nil? xs)
@@ -81,16 +80,16 @@
     i
     (f (car xs) (foldr f i (cdr xs)))))
 
-(defun rev (ls)
-  (foldl (flip cons) '() ls))
+(defun append ls
+  (foldr *append '() ls))
 
-(defun append2 (a b)
+(defun *append (a b)
   (if (nil? a)
     b
-    (cons (car a) (append2 (cdr a) b))))
+    (cons (car a) (*append (cdr a) b))))
 
-(defun append ls
-  (foldr append2 '() ls))
+(defun rev (ls)
+  (foldl (flip cons) '() ls))
 
 (defun not (x)
   (if x #f #t))
@@ -148,7 +147,7 @@
          (list 'list (list 'quote 'unquote) (*qq (- rank 1) (cadr x))))]
       [(and (cons? (car x)) (= (caar x) 'unquote-splicing))
        (if (= rank 0)
-         (list 'append2 (cadar x) (*qq rank (cdr x)))
+         (list 'append (cadar x) (*qq rank (cdr x)))
          (list 'cons (list 'list (list 'quote 'unquote-splicing) (*qq (- rank 1) (cadar x))) (*qq rank (cdr x))))]
       [(= (car x) 'quasiquote)
        (list 'list (list 'quote 'quasiquote) (*qq (+ rank 1) (cadr x)))]
@@ -231,8 +230,20 @@
 (defbuiltin macroexpand (s))
 (defbuiltin macroexpand-1 (s))
 
-(defun p args
-  (println (foldl concat "" (map show args))))
+;;;;;;;;;
+
+(defbuiltin print strs)
+(defbuiltin newline ())
+
+(defun println strs
+  (apply print strs)
+  (newline))
+
+(defbuiltin show (x))
+
+(defun p xs
+  (apply print (map show xs))
+  (newline))
 
 (defun count (xs)
   (let loop ([xs xs] [c 0])
