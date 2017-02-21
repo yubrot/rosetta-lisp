@@ -62,6 +62,6 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 (print strs)
 (newline)
 
-(show x)
+(inspect x)
 ```
 

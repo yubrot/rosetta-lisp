@@ -4,6 +4,6 @@
       [(= 0 (% i 3) (% i 5)) "FizzBuzz"]
       [(= 0 (% i 3)) "Fizz"]
       [(= 0 (% i 5)) "Buzz"]
-      [else (show i)]))
+      [else (inspect i)]))
   (when (< i 40)
     (loop (+ i 1))))

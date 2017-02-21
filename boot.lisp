@@ -239,10 +239,10 @@
   (apply print strs)
   (newline))
 
-(defbuiltin show (x))
+(defbuiltin inspect (x))
 
 (defun p xs
-  (apply print (map show xs))
+  (apply print (map inspect xs))
   (newline))
 
 (defun count (xs)
