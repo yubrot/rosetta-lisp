@@ -1,0 +1,117 @@
+> foo
+foo
+
+> abc123
+abc123
+
+> foo-bar
+foo-bar
+
+> *foo*
+*foo*
+
+> x
+x
+
+> x1.y2:
+x1.y2:
+
+> the-Answer-to-the-Ultimate-Question
+the-Answer-to-the-Ultimate-Question
+
+> 0
+0
+
+> 1234
+1234
+
+> 3.5
+3.5
+
+> +732
+732
+
+> -42
+-42
+
+> 13e2
+1300
+
+> 9e+1
+90
+
+> 125e-1
+12.5
+
+> "foo"
+"foo"
+
+> "Hello, World!"
+"Hello, World!"
+
+> "( ) . 0 a"
+"( ) . 0 a"
+
+> "foo\nbar"
+"foo\nbar"
+
+> "foo
+> bar"
+"foo\nbar"
+
+> "A \" B"
+"A \" B"
+
+> "A\t	B"
+"A\t\tB"
+
+> "\\\\"
+"\\\\"
+
+> ()
+()
+
+> []
+()
+
+> (foo . bar)
+(foo . bar)
+
+> (1 2 . 3)
+(1 2 . 3)
+
+> (a b c d)
+(a b c d)
+
+> (foo [bar (baz)])
+(foo (bar (baz)))
+
+> (#t #f)
+(#t #f)
+
+> 'foo
+'foo
+
+> '(foo 123)
+'(foo 123)
+
+> `(i ,j ,@(k l))
+`(i ,j ,@(k l))
+
+>        123      
+123
+
+> ; hello
+> ; world
+> ()
+()
+
+> (foo ; comment
+> bar) ; comment
+(foo bar)
+
+> (this
+> is
+> the
+> last)
+(this is the last)

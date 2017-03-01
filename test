@@ -1,0 +1,1357 @@
+testsuites/syntax:1
+PARSE_SUCCESS 1 1
+foo
+foo
+testsuites/syntax:4
+PARSE_SUCCESS 1 1
+abc123
+abc123
+testsuites/syntax:7
+PARSE_SUCCESS 1 1
+foo-bar
+foo-bar
+testsuites/syntax:10
+PARSE_SUCCESS 1 1
+*foo*
+*foo*
+testsuites/syntax:13
+PARSE_SUCCESS 1 1
+x
+x
+testsuites/syntax:16
+PARSE_SUCCESS 1 1
+x1.y2:
+x1.y2:
+testsuites/syntax:19
+PARSE_SUCCESS 1 1
+the-Answer-to-the-Ultimate-Question
+the-Answer-to-the-Ultimate-Question
+testsuites/syntax:22
+PARSE_SUCCESS 1 1
+0
+0
+testsuites/syntax:25
+PARSE_SUCCESS 1 1
+1234
+1234
+testsuites/syntax:28
+PARSE_SUCCESS 1 1
+3.5
+3.5
+testsuites/syntax:31
+PARSE_SUCCESS 1 1
++732
+732
+testsuites/syntax:34
+PARSE_SUCCESS 1 1
+-42
+-42
+testsuites/syntax:37
+PARSE_SUCCESS 1 1
+13e2
+1300
+testsuites/syntax:40
+PARSE_SUCCESS 1 1
+9e+1
+90
+testsuites/syntax:43
+PARSE_SUCCESS 1 1
+125e-1
+12.5
+testsuites/syntax:46
+PARSE_SUCCESS 1 1
+"foo"
+"foo"
+testsuites/syntax:49
+PARSE_SUCCESS 1 1
+"Hello, World!"
+"Hello, World!"
+testsuites/syntax:52
+PARSE_SUCCESS 1 1
+"( ) . 0 a"
+"( ) . 0 a"
+testsuites/syntax:55
+PARSE_SUCCESS 1 1
+"foo\nbar"
+"foo\nbar"
+testsuites/syntax:58
+PARSE_SUCCESS 2 1
+"foo
+bar"
+"foo\nbar"
+testsuites/syntax:62
+PARSE_SUCCESS 1 1
+"A \" B"
+"A \" B"
+testsuites/syntax:65
+PARSE_SUCCESS 1 1
+"A\t	B"
+"A\t\tB"
+testsuites/syntax:68
+PARSE_SUCCESS 1 1
+"\\\\"
+"\\\\"
+testsuites/syntax:71
+PARSE_SUCCESS 1 1
+()
+()
+testsuites/syntax:74
+PARSE_SUCCESS 1 1
+[]
+()
+testsuites/syntax:77
+PARSE_SUCCESS 1 1
+(foo . bar)
+(foo . bar)
+testsuites/syntax:80
+PARSE_SUCCESS 1 1
+(1 2 . 3)
+(1 2 . 3)
+testsuites/syntax:83
+PARSE_SUCCESS 1 1
+(a b c d)
+(a b c d)
+testsuites/syntax:86
+PARSE_SUCCESS 1 1
+(foo [bar (baz)])
+(foo (bar (baz)))
+testsuites/syntax:89
+PARSE_SUCCESS 1 1
+(#t #f)
+(#t #f)
+testsuites/syntax:92
+PARSE_SUCCESS 1 1
+'foo
+'foo
+testsuites/syntax:95
+PARSE_SUCCESS 1 1
+'(foo 123)
+'(foo 123)
+testsuites/syntax:98
+PARSE_SUCCESS 1 1
+`(i ,j ,@(k l))
+`(i ,j ,@(k l))
+testsuites/syntax:101
+PARSE_SUCCESS 1 1
+       123      
+123
+testsuites/syntax:104
+PARSE_SUCCESS 3 1
+; hello
+; world
+()
+()
+testsuites/syntax:109
+PARSE_SUCCESS 2 1
+(foo ; comment
+bar) ; comment
+(foo bar)
+testsuites/syntax:113
+PARSE_SUCCESS 4 1
+(this
+is
+the
+last)
+(this is the last)
+testsuites/compiler:1
+COMPILE_SUCCESS 1 2
+123
+[0 entry]
+  ldc 123
+testsuites/compiler:5
+COMPILE_SUCCESS 1 2
+"foo"
+[0 entry]
+  ldc "foo"
+testsuites/compiler:9
+COMPILE_SUCCESS 1 2
+foo
+[0 entry]
+  ldv foo
+testsuites/compiler:13
+COMPILE_SUCCESS 1 3
+(foo)
+[0 entry]
+  ldv foo
+  app 0
+testsuites/compiler:18
+COMPILE_SUCCESS 1 5
+(foo bar baz)
+[0 entry]
+  ldv foo
+  ldv bar
+  ldv baz
+  app 2
+testsuites/compiler:25
+COMPILE_SUCCESS 1 8
+(foo (bar (baz)) hoge)
+[0 entry]
+  ldv foo
+  ldv bar
+  ldv baz
+  app 0
+  app 1
+  ldv hoge
+  app 2
+testsuites/compiler:35
+COMPILE_FAILURE 1
+(foo . bar)
+testsuites/compiler:38
+COMPILE_FAILURE 1
+(a b c . d)
+testsuites/compiler:41
+COMPILE_SUCCESS 1 2
+(begin)
+[0 entry]
+  ldc ()
+testsuites/compiler:45
+COMPILE_SUCCESS 1 2
+(begin x)
+[0 entry]
+  ldv x
+testsuites/compiler:49
+COMPILE_SUCCESS 1 4
+(begin x y)
+[0 entry]
+  ldv x
+  pop
+  ldv y
+testsuites/compiler:55
+COMPILE_SUCCESS 1 8
+(begin a (b c) d)
+[0 entry]
+  ldv a
+  pop
+  ldv b
+  ldv c
+  app 1
+  pop
+  ldv d
+testsuites/compiler:65
+COMPILE_SUCCESS 1 4
+(def hello 123)
+[0 entry]
+  ldc 123
+  def hello
+  ldc ()
+testsuites/compiler:71
+COMPILE_SUCCESS 1 6
+(def hello (a b))
+[0 entry]
+  ldv a
+  ldv b
+  app 1
+  def hello
+  ldc ()
+testsuites/compiler:79
+COMPILE_SUCCESS 1 6
+(set! goodbye (c d))
+[0 entry]
+  ldv c
+  ldv d
+  app 1
+  set goodbye
+  ldc ()
+testsuites/compiler:87
+COMPILE_FAILURE 1
+(def hello)
+testsuites/compiler:90
+COMPILE_FAILURE 1
+(def (foo bar) 123)
+testsuites/compiler:93
+COMPILE_FAILURE 1
+(def "string" 42)
+testsuites/compiler:96
+COMPILE_SUCCESS 1 9
+(if a b c)
+[0 entry]
+  ldv a
+  sel [1 then] [2 else]
+[1 then]
+  ldv b
+  leave
+[2 else]
+  ldv c
+  leave
+testsuites/compiler:107
+COMPILE_FAILURE 1
+(if a b)
+testsuites/compiler:110
+COMPILE_SUCCESS 1 13
+(if (a b) (x y) z)
+[0 entry]
+  ldv a
+  ldv b
+  app 1
+  sel [1 then] [2 else]
+[1 then]
+  ldv x
+  ldv y
+  app 1
+  leave
+[2 else]
+  ldv z
+  leave
+testsuites/compiler:125
+COMPILE_SUCCESS 1 30
+(if (if a b c) (if d e f) (if g h i))
+[0 entry]
+  ldv a
+  sel [1 then] [2 else]
+  sel [3 then] [6 else]
+[1 then]
+  ldv b
+  leave
+[2 else]
+  ldv c
+  leave
+[3 then]
+  ldv d
+  sel [4 then] [5 else]
+  leave
+[4 then]
+  ldv e
+  leave
+[5 else]
+  ldv f
+  leave
+[6 else]
+  ldv g
+  sel [7 then] [8 else]
+  leave
+[7 then]
+  ldv h
+  leave
+[8 else]
+  ldv i
+  leave
+testsuites/compiler:157
+COMPILE_FAILURE 1
+(if a b c d)
+testsuites/compiler:160
+COMPILE_SUCCESS 1 5
+(fun ())
+[0 entry]
+  ldf [1 fun ()]
+[1 fun ()]
+  ldc ()
+  leave
+testsuites/compiler:167
+COMPILE_SUCCESS 1 7
+(fun () 12 34)
+[0 entry]
+  ldf [1 fun ()]
+[1 fun ()]
+  ldc 12
+  pop
+  ldc 34
+  leave
+testsuites/compiler:176
+COMPILE_FAILURE 1
+(fun "x")
+testsuites/compiler:179
+COMPILE_SUCCESS 1 5
+(fun abc)
+[0 entry]
+  ldf [1 fun abc]
+[1 fun abc]
+  ldc ()
+  leave
+testsuites/compiler:186
+COMPILE_SUCCESS 1 5
+(fun (a b . c))
+[0 entry]
+  ldf [1 fun (a b . c)]
+[1 fun (a b . c)]
+  ldc ()
+  leave
+testsuites/compiler:193
+COMPILE_SUCCESS 1 5
+(fun (x y) z)
+[0 entry]
+  ldf [1 fun (x y)]
+[1 fun (x y)]
+  ldv z
+  leave
+testsuites/compiler:200
+COMPILE_FAILURE 1
+(fun (0))
+testsuites/compiler:203
+COMPILE_SUCCESS 1 4
+(macro ())
+[0 entry]
+  ldm [1 macro ()]
+[1 macro ()]
+  ldc ()
+testsuites/compiler:209
+COMPILE_SUCCESS 1 4
+(macro (x y) x)
+[0 entry]
+  ldm [1 macro (x y)]
+[1 macro (x y)]
+  ldv x
+testsuites/compiler:215
+COMPILE_SUCCESS 1 2
+(builtin hello)
+[0 entry]
+  ldb hello
+testsuites/compiler:219
+COMPILE_FAILURE 1
+(builtin "hello")
+testsuites/compiler:222
+COMPILE_SUCCESS 1 2
+'(1 2 3)
+[0 entry]
+  ldc (1 2 3)
+testsuites/compiler:226
+COMPILE_FAILURE 1
+(quote a b)
+testsuites/vm:1
+EVAL_SUCCESS 1 1
+123
+123
+testsuites/vm:4
+EVAL_SUCCESS 1 1
+'hoge
+hoge
+testsuites/vm:7
+EVAL_SUCCESS 1 1
+(begin 123 456 789)
+789
+testsuites/vm:10
+EVAL_FAILURE 1
+foo
+testsuites/vm:13
+EVAL_SUCCESS 1 1
+(def foo "foo")
+()
+testsuites/vm:16
+EVAL_SUCCESS 1 1
+foo
+"foo"
+testsuites/vm:19
+EVAL_SUCCESS 1 1
+(def foo "bar")
+()
+testsuites/vm:22
+EVAL_SUCCESS 1 1
+foo
+"bar"
+testsuites/vm:25
+EVAL_SUCCESS 1 1
+(set! foo "baz")
+()
+testsuites/vm:28
+EVAL_SUCCESS 1 1
+foo
+"baz"
+testsuites/vm:31
+EVAL_FAILURE 1
+(set! hoge "fuga")
+testsuites/vm:34
+EVAL_SUCCESS 1 1
+(fun () 123)
+<fun>
+testsuites/vm:37
+EVAL_SUCCESS 1 1
+((fun () 123))
+123
+testsuites/vm:40
+EVAL_FAILURE 1
+((fun (a b) a) 12)
+testsuites/vm:43
+EVAL_SUCCESS 1 1
+((fun (a b) a) 12 34)
+12
+testsuites/vm:46
+EVAL_FAILURE 1
+((fun (a b) a) 12 34 56)
+testsuites/vm:49
+EVAL_FAILURE 1
+((fun (a . b) b))
+testsuites/vm:52
+EVAL_SUCCESS 1 1
+((fun (a . b) a) 12)
+12
+testsuites/vm:55
+EVAL_SUCCESS 1 1
+((fun (a . b) b) 12)
+()
+testsuites/vm:58
+EVAL_SUCCESS 1 1
+((fun (a . b) b) 12 34 56)
+(34 56)
+testsuites/vm:61
+EVAL_SUCCESS 1 1
+((fun a a) 12 34)
+(12 34)
+testsuites/vm:64
+EVAL_SUCCESS 1 1
+(set! foo #t)
+()
+testsuites/vm:66
+EVAL_SUCCESS 1 1
+((fun () (def foo #f)))
+()
+testsuites/vm:68
+EVAL_SUCCESS 1 1
+foo
+#t
+testsuites/vm:71
+EVAL_SUCCESS 1 1
+((fun () (set! foo #f)))
+()
+testsuites/vm:73
+EVAL_SUCCESS 1 1
+foo
+#f
+testsuites/vm:76
+EVAL_SUCCESS 1 1
+(def _list (fun a a))
+()
+testsuites/vm:78
+EVAL_SUCCESS 1 1
+(_list 1 (_list 2 3) 4)
+(1 (2 3) 4)
+testsuites/vm:81
+EVAL_SUCCESS 1 1
+(set! foo 0)
+()
+testsuites/vm:83
+EVAL_SUCCESS 1 1
+(set! foo (_list foo 1))
+()
+testsuites/vm:85
+EVAL_SUCCESS 1 1
+foo
+(0 1)
+testsuites/vm:88
+EVAL_SUCCESS 6 1
+(begin
+  (set! foo 0)
+  (set! foo (_list foo 1))
+  (set! foo (_list foo 2))
+  (set! foo (_list foo 3))
+  foo)
+(((0 1) 2) 3)
+testsuites/vm:96
+EVAL_SUCCESS 1 1
+(if #t 123 456)
+123
+testsuites/vm:99
+EVAL_SUCCESS 1 1
+(if #f 123 456)
+456
+testsuites/vm:102
+EVAL_SUCCESS 1 1
+(if "anything except #f" 123 456)
+123
+testsuites/vm:105
+EVAL_SUCCESS 1 1
+(if () 123 456)
+123
+testsuites/vm:108
+EVAL_SUCCESS 1 1
+(if #t (def hoge "fuga") (def hoge "fuga"))
+()
+testsuites/vm:110
+EVAL_FAILURE 1
+hoge
+testsuites/vm:113
+EVAL_SUCCESS 6 1
+(begin
+  (set! foo 0)
+  (if #t
+    (set! foo (_list foo 1))
+    (set! foo (_list foo 2)))
+  foo)
+(0 1)
+testsuites/vm:121
+EVAL_SUCCESS 6 1
+(begin
+  (set! foo 0)
+  (if #f
+    (set! foo (_list foo 1))
+    (set! foo (_list foo 2)))
+  foo)
+(0 2)
+testsuites/vm:129
+EVAL_SUCCESS 1 1
+(macro (a b) a)
+<macro>
+testsuites/vm:132
+EVAL_FAILURE 1
+((macro (a b) a) 12 34)
+testsuites/vm:135
+EVAL_SUCCESS 1 1
+(def _skip (macro (a . b) b))
+()
+testsuites/vm:137
+EVAL_SUCCESS 1 1
+(_skip 12 _list 34 56)
+(34 56)
+testsuites/vm:140
+EVAL_SUCCESS 1 1
+(set! foo #t)
+()
+testsuites/vm:142
+EVAL_SUCCESS 1 1
+(_skip (set! foo #f) _list)
+()
+testsuites/vm:144
+EVAL_SUCCESS 1 1
+foo
+#t
+testsuites/vm:147
+EVAL_SUCCESS 1 1
+(_skip 12 _skip 34 _list 56 78)
+(56 78)
+testsuites/vm:150
+EVAL_SUCCESS 1 1
+(_list 12 (_skip 34 _list 56 78))
+(12 (56 78))
+boot.lisp:1
+EVAL_ALL 1
+(def cons (builtin cons))
+boot.lisp:2
+EVAL_FAILURE 1
+(cons 1)
+boot.lisp:4
+EVAL_SUCCESS 1 1
+(cons 1 2)
+(1 . 2)
+boot.lisp:6
+EVAL_FAILURE 1
+(cons 1 2 3)
+boot.lisp:8
+EVAL_ALL 6
+
+(def list (fun xs xs))
+
+(def defun (macro (sym . body) (list 'def sym (cons 'fun body))))
+(def defmacro (macro (sym . body) (list 'def sym (cons 'macro body))))
+(def defbuiltin (macro (sym . intf) (list 'def sym (list 'builtin sym))))
+boot.lisp:14
+EVAL_SUCCESS 1 1
+(defun _f (a b) b)
+()
+boot.lisp:16
+EVAL_SUCCESS 1 1
+(_f 3 5)
+5
+boot.lisp:18
+EVAL_SUCCESS 1 1
+(defmacro _m (a . b) b)
+()
+boot.lisp:20
+EVAL_SUCCESS 1 1
+(_m 1 _f 2 3)
+3
+boot.lisp:22
+EVAL_ALL 8
+
+(defbuiltin exit (exitcode))
+(defbuiltin error (msg))
+
+(defbuiltin gensym ())
+
+(defbuiltin car (cons))
+(defbuiltin cdr (cons))
+boot.lisp:30
+EVAL_SUCCESS 1 1
+(car (cons 12 34))
+12
+boot.lisp:32
+EVAL_SUCCESS 1 1
+(cdr (cons 12 34))
+34
+boot.lisp:34
+EVAL_ALL 2
+
+(defbuiltin apply (f args))
+boot.lisp:36
+EVAL_SUCCESS 1 1
+(apply cons (list 12 34))
+(12 . 34)
+boot.lisp:38
+EVAL_ALL 3
+
+(defun compose (f g)
+  (fun (x) (f (g x))))
+boot.lisp:41
+EVAL_SUCCESS 1 1
+((compose car cdr) (list 12 34 56))
+34
+boot.lisp:43
+EVAL_ALL 3
+
+(defun flip (f)
+  (fun (a b) (f b a)))
+boot.lisp:46
+EVAL_SUCCESS 1 1
+((flip (fun (a b) a)) 12 34)
+34
+boot.lisp:48
+EVAL_ALL 22
+
+(def caar (compose car car))
+(def cadr (compose car cdr))
+(def cdar (compose cdr car))
+(def cddr (compose cdr cdr))
+(def caaar (compose car caar))
+(def cdaar (compose cdr caar))
+(def cadar (compose car cdar))
+(def cddar (compose cdr cdar))
+(def caadr (compose car cadr))
+(def cdadr (compose cdr cadr))
+(def caddr (compose car cddr))
+(def cdddr (compose cdr cddr))
+
+(defbuiltin num? (x))
+(defbuiltin sym? (x))
+(defbuiltin str? (x))
+(defbuiltin cons? (x))
+(defbuiltin nil? (x))
+(defbuiltin bool? (x))
+(defbuiltin proc? (x))
+(defbuiltin meta? (x))
+boot.lisp:70
+EVAL_SUCCESS 1 1
+(num? 123)
+#t
+boot.lisp:72
+EVAL_FAILURE 1
+(num? 12 34)
+boot.lisp:74
+EVAL_SUCCESS 1 1
+(num? "foo")
+#f
+boot.lisp:76
+EVAL_SUCCESS 1 1
+(sym? 'foo)
+#t
+boot.lisp:78
+EVAL_SUCCESS 1 1
+(str? "foo")
+#t
+boot.lisp:80
+EVAL_SUCCESS 1 1
+(cons? (list 1 2 3))
+#t
+boot.lisp:82
+EVAL_SUCCESS 1 1
+(nil? ())
+#t
+boot.lisp:84
+EVAL_SUCCESS 1 1
+(list (bool? #t) (bool? ()))
+(#t #f)
+boot.lisp:86
+EVAL_SUCCESS 1 1
+(list (proc? (fun ())) (proc? cons) (proc? (macro ())) (proc? def))
+(#t #t #f #f)
+boot.lisp:88
+EVAL_SUCCESS 1 1
+(list (meta? (fun ())) (meta? cons) (meta? (macro ())) (meta? def))
+(#f #f #t #t)
+boot.lisp:90
+EVAL_ALL 7
+
+(defun list? (x)
+  (if (nil? x)
+    #t
+    (if (cons? x)
+      (list? (cdr x))
+      #f)))
+boot.lisp:97
+EVAL_SUCCESS 1 1
+(list? ())
+#t
+boot.lisp:99
+EVAL_SUCCESS 1 1
+(list? '(12 . 34))
+#f
+boot.lisp:101
+EVAL_SUCCESS 1 1
+(list? '(12 34 . 56))
+#f
+boot.lisp:103
+EVAL_SUCCESS 1 1
+(list? '(12 34 56))
+#t
+boot.lisp:105
+EVAL_ALL 6
+
+(defbuiltin + nums)
+(defbuiltin - (num . nums))
+(defbuiltin * nums)
+(defbuiltin / (num . nums))
+(defbuiltin % (num . nums))
+boot.lisp:111
+EVAL_SUCCESS 1 1
+(list (+) (+ 11) (+ 3 4 5))
+(0 11 12)
+boot.lisp:113
+EVAL_SUCCESS 1 1
+(list (- 5) (- 5 2))
+(-5 3)
+boot.lisp:115
+EVAL_SUCCESS 1 1
+(list (*) (* 11) (* 3 4 5))
+(1 11 60)
+boot.lisp:117
+EVAL_SUCCESS 1 1
+(list (/ 2) (/ 20 5 2))
+(0.5 2)
+boot.lisp:119
+EVAL_SUCCESS 1 1
+(list (% 5) (% 5 3))
+(5 2)
+boot.lisp:121
+EVAL_ALL 3
+
+(defbuiltin concat strs)
+(defbuiltin length (str)) ; byte size
+boot.lisp:124
+EVAL_SUCCESS 1 1
+(concat)
+""
+boot.lisp:126
+EVAL_SUCCESS 1 1
+(concat "foo" "bar" "baz")
+"foobarbaz"
+boot.lisp:128
+EVAL_SUCCESS 1 1
+(length "foobar")
+6
+boot.lisp:130
+EVAL_FAILURE 1
+(length "foobar" "baz")
+boot.lisp:132
+EVAL_ALL 2
+
+(defbuiltin = xs)
+boot.lisp:134
+EVAL_SUCCESS 1 1
+(list (=) (= 1) (= 1 1) (= 1 2) (= 1 1 1) (= 1 1 2))
+(#t #t #t #f #t #f)
+boot.lisp:136
+EVAL_SUCCESS 1 1
+(list (= "foo" "foo") (= "foo" "bar"))
+(#t #f)
+boot.lisp:138
+EVAL_SUCCESS 1 1
+(list (= #t #t) (= #f #f) (= #t #f))
+(#t #t #f)
+boot.lisp:140
+EVAL_SUCCESS 1 1
+(list (= () ()) (= '(1 2) '(1 2)) (= '(1 2) '(1 3)) (= '(1 2 . 3) '(1 2 . 3)) (= '(1 2 3) '(1 2 . 3)))
+(#t #t #f #t #f)
+boot.lisp:142
+EVAL_SUCCESS 1 1
+(= (fun ()) (fun ()))
+#f
+boot.lisp:144
+EVAL_SUCCESS 1 1
+(list (= 123 "123") (= "foo" 'foo))
+(#f #f)
+boot.lisp:146
+EVAL_ALL 5
+
+(defbuiltin < nums-or-strs)
+(defbuiltin > nums-or-strs)
+(defbuiltin <= nums-or-strs)
+(defbuiltin >= nums-or-strs)
+boot.lisp:151
+EVAL_SUCCESS 1 1
+(list (<) (< 1) (< 1 2) (< 1 2 3) (< 1 3 3) (< 1 4 3) (< 4 3) (< 4 4 3))
+(#t #t #t #t #f #f #f #f)
+boot.lisp:153
+EVAL_SUCCESS 1 1
+(list (>) (> 1) (> 1 2) (> 1 2 3) (> 1 3 3) (> 1 4 3) (> 4 3) (> 4 4 3))
+(#t #t #f #f #f #f #t #f)
+boot.lisp:155
+EVAL_SUCCESS 1 1
+(list (<=) (<= 1) (<= 1 2) (<= 1 2 3) (<= 1 3 3) (<= 1 4 3) (<= 4 3) (<= 4 4 3))
+(#t #t #t #t #t #f #f #f)
+boot.lisp:157
+EVAL_SUCCESS 1 1
+(list (>=) (>= 1) (>= 1 2) (>= 1 2 3) (>= 1 3 3) (>= 1 4 3) (>= 4 3) (>= 4 4 3))
+(#t #t #f #f #f #f #t #t)
+boot.lisp:159
+EVAL_SUCCESS 1 1
+(list (< "abc" "cab") (< "abc" "abd") (< "bac" "acb"))
+(#t #t #f)
+boot.lisp:161
+EVAL_FAILURE 1
+(< 123 "456")
+boot.lisp:163
+EVAL_FAILURE 1
+(< #f)
+boot.lisp:165
+EVAL_ALL 5
+
+(defun map (f xs)
+  (if (nil? xs)
+    ()
+    (cons (f (car xs)) (map f (cdr xs)))))
+boot.lisp:170
+EVAL_SUCCESS 1 1
+(map (fun (a) (* a 3)) (list 1 2 5 4))
+(3 6 15 12)
+boot.lisp:172
+EVAL_ALL 5
+
+(defun foldl (f i xs)
+  (if (nil? xs)
+    i
+    (foldl f (f i (car xs)) (cdr xs))))
+boot.lisp:177
+EVAL_SUCCESS 1 1
+(foldl cons () (list 2 5 3))
+(((() . 2) . 5) . 3)
+boot.lisp:179
+EVAL_ALL 5
+
+(defun foldr (f i xs)
+  (if (nil? xs)
+    i
+    (f (car xs) (foldr f i (cdr xs)))))
+boot.lisp:184
+EVAL_SUCCESS 1 1
+(foldr cons () (list 2 5 3))
+(2 5 3)
+boot.lisp:186
+EVAL_ALL 8
+
+(defun append ls
+  (foldr *append () ls))
+
+(defun *append (a b)
+  (if (nil? a)
+    b
+    (cons (car a) (*append (cdr a) b))))
+boot.lisp:194
+EVAL_SUCCESS 1 1
+(append (list 1 2 3) (list 4 5 6))
+(1 2 3 4 5 6)
+boot.lisp:196
+EVAL_ALL 3
+
+(defun rev (ls)
+  (foldl (flip cons) () ls))
+boot.lisp:199
+EVAL_SUCCESS 1 1
+(rev (list 1 2 4 5))
+(5 4 2 1)
+boot.lisp:201
+EVAL_ALL 3
+
+(defun not (x)
+  (if x #f #t))
+boot.lisp:204
+EVAL_SUCCESS 1 1
+(map not (list 123 () #t #f))
+(#f #f #f #t)
+boot.lisp:206
+EVAL_ALL 9
+
+(def else #t)
+
+(defmacro cond preds
+  (if (nil? preds)
+    ()
+    (list 'if (caar preds)
+          (cons 'begin (cdar preds))
+          (cons 'cond (cdr preds)))))
+boot.lisp:215
+EVAL_SUCCESS 1 1
+(cond)
+()
+boot.lisp:217
+EVAL_SUCCESS 1 1
+(cond [#t 123])
+123
+boot.lisp:219
+EVAL_SUCCESS 1 1
+(cond [#t 123 456])
+456
+boot.lisp:221
+EVAL_SUCCESS 1 1
+(cond [#t 1] [#t 2] [#t 3])
+1
+boot.lisp:223
+EVAL_SUCCESS 1 1
+(cond [#f 1] [#t 2] [#t 3])
+2
+boot.lisp:225
+EVAL_SUCCESS 1 1
+(cond [#f 1] [#f 2] [#t 3])
+3
+boot.lisp:227
+EVAL_SUCCESS 1 1
+(cond [#f 1] [#f 2] [#f 3])
+()
+boot.lisp:229
+EVAL_ALL 11
+; TODO tests for side effects
+
+(defmacro and values
+  (cond
+    [(nil? values) #t]
+    [(nil? (cdr values)) (car values)]
+    [else ((fun (tmp)
+             (list (list 'fun (list tmp)
+                         (list 'if tmp (cons 'and (cdr values)) tmp))
+                   (car values)))
+           (gensym))]))
+boot.lisp:240
+EVAL_SUCCESS 1 1
+(and)
+#t
+boot.lisp:242
+EVAL_SUCCESS 1 1
+(and 123)
+123
+boot.lisp:244
+EVAL_SUCCESS 1 1
+(and 123 456)
+456
+boot.lisp:246
+EVAL_SUCCESS 1 1
+(and #f 456)
+#f
+boot.lisp:248
+EVAL_SUCCESS 1 1
+(and 123 456 789)
+789
+boot.lisp:250
+EVAL_ALL 11
+; TODO tests for side effects
+
+(defmacro or values
+  (cond
+    [(nil? values) #f]
+    [(nil? (cdr values)) (car values)]
+    [else ((fun (tmp)
+             (list (list 'fun (list tmp)
+                         (list 'if tmp tmp (cons 'or (cdr values))))
+                   (car values)))
+           (gensym))]))
+boot.lisp:261
+EVAL_SUCCESS 1 1
+(or)
+#f
+boot.lisp:263
+EVAL_SUCCESS 1 1
+(or 123)
+123
+boot.lisp:265
+EVAL_SUCCESS 1 1
+(or 123 456)
+123
+boot.lisp:267
+EVAL_SUCCESS 1 1
+(or #f 456)
+456
+boot.lisp:269
+EVAL_SUCCESS 1 1
+(or 123 456 789)
+123
+boot.lisp:271
+EVAL_ALL 7
+; TODO tests for side effects
+
+(defun all (f xs)
+  (if (nil? xs)
+    #t
+    (and (f (car xs))
+         (all f (cdr xs)))))
+boot.lisp:278
+EVAL_SUCCESS 1 1
+(all num? (list))
+#t
+boot.lisp:280
+EVAL_SUCCESS 1 1
+(all num? (list 1 2 3))
+#t
+boot.lisp:282
+EVAL_SUCCESS 1 1
+(all num? (list 1 "2" 3))
+#f
+boot.lisp:284
+EVAL_ALL 6
+
+(defun any (f xs)
+  (if (nil? xs)
+    #f
+    (or (f (car xs))
+        (any f (cdr xs)))))
+boot.lisp:290
+EVAL_SUCCESS 1 1
+(any num? (list))
+#f
+boot.lisp:292
+EVAL_SUCCESS 1 1
+(any num? (list 1 2 3))
+#t
+boot.lisp:294
+EVAL_SUCCESS 1 1
+(any num? (list "1" 2 "3"))
+#t
+boot.lisp:296
+EVAL_SUCCESS 1 1
+(any num? (list "1" "2" "3"))
+#f
+boot.lisp:298
+EVAL_ALL 51
+
+(defmacro quasiquote ls
+  (*qq 0 (car ls)))
+
+(defun *qq (rank x)
+  (if (cons? x)
+    (cond
+      [(= (car x) 'unquote)
+       (if (= rank 0)
+         (cadr x)
+         (list 'list (list 'quote 'unquote) (*qq (- rank 1) (cadr x))))]
+      [(and (cons? (car x)) (= (caar x) 'unquote-splicing))
+       (if (= rank 0)
+         (list 'append (cadar x) (*qq rank (cdr x)))
+         (list 'cons (list 'list (list 'quote 'unquote-splicing) (*qq (- rank 1) (cadar x))) (*qq rank (cdr x))))]
+      [(= (car x) 'quasiquote)
+       (list 'list (list 'quote 'quasiquote) (*qq (+ rank 1) (cadr x)))]
+      [else
+        (list 'cons (*qq rank (car x)) (*qq rank (cdr x)))])
+    (list 'quote x)))
+
+(defun *bind? (x)
+  (and (cons? x)
+       (cons? (cdr x))
+       (nil? (cddr x))
+       (sym? (car x))))
+
+(defmacro let (binds . body)
+  (cond
+    [(sym? binds)
+      `(named-let ,binds ,@body)]
+    [(nil? binds)
+      `(begin ,@body)]
+    [(not (and (cons? binds) (*bind? (car binds))))
+      (error "Syntax error: expected (let ((name expr)...) body...)")]
+    [else
+      `((fun (,(caar binds)) (let ,(cdr binds) ,@body))
+        ,(cadar binds))]))
+
+(defmacro letrec (binds . body)
+  (if (and (list? binds) (all *bind? binds))
+    (let ([vars (map (fun (x) `[,(car x) ()]) binds)]
+          [inits (map (fun (x) `(set! ,(car x) ,(cadr x))) binds)])
+      `(let ,vars ,@inits ,@body))
+    (error "Syntax error: expected (letrec ((name expr)...) body...)")))
+
+(defmacro named-let (sym binds . body)
+  (if (and (list? binds) (all *bind? binds))
+    (let ([args (map car binds)])
+      `(let ,binds (letrec ([,sym (fun ,args ,@body)]) (,sym ,@args))))
+    (error "Syntax error: expected (named-let name ((name expr)...) body...)")))
+boot.lisp:350
+EVAL_SUCCESS 1 1
+(let ([_x 2] [_y 3]) (* _x _y))
+6
+boot.lisp:352
+EVAL_FAILURE 1
+_x
+boot.lisp:354
+EVAL_SUCCESS 4 1
+(let _loop ([x 10] [sum 0])
+  (if (< 0 x)
+    (_loop (- x 1) (+ sum x))
+    sum))
+55
+boot.lisp:359
+EVAL_FAILURE 1
+_loop
+boot.lisp:361
+EVAL_SUCCESS 1 1
+(let ([x 3] [x (* x 4)] [x (+ x 5)]) x)
+17
+boot.lisp:363
+EVAL_SUCCESS 3 1
+(letrec ([even? (fun (x) (if (= (% x 2) 0) #t (odd? (- x 1))))]
+         [odd? (fun (x) (if (= (% x 2) 0) #f (even? (- x 1))))])
+  (list (even? 4) (even? 5) (odd? 6) (odd? 7)))
+(#t #f #f #t)
+boot.lisp:367
+EVAL_ALL 3
+
+(defmacro when (cond . body)
+  `(if ,cond (begin ,@body) ()))
+boot.lisp:370
+EVAL_SUCCESS 1 1
+(when #f 123 456)
+()
+boot.lisp:372
+EVAL_SUCCESS 1 1
+(when #t 123 456)
+456
+boot.lisp:374
+EVAL_ALL 3
+
+(defmacro unless (cond . body)
+  `(if ,cond () (begin ,@body)))
+boot.lisp:377
+EVAL_SUCCESS 1 1
+(unless #f 123 456)
+456
+boot.lisp:379
+EVAL_SUCCESS 1 1
+(unless #t 123 456)
+()
+boot.lisp:381
+EVAL_ALL 3
+
+(defmacro let1 (var expr . body)
+  `(let ([,var ,expr]) ,@body))
+boot.lisp:384
+EVAL_SUCCESS 4 1
+(let1 x 3
+  (let1 x (* x 4)
+    (let1 x (+ x 5)
+      x)))
+17
+boot.lisp:389
+EVAL_ALL 5
+
+(defbuiltin call/cc (fun))
+
+(defmacro let/cc (k . body)
+  `(call/cc (fun (,k) ,@body)))
+boot.lisp:395
+EVAL_SUCCESS 1 1
+(+ 1 (let/cc cont (+ 10 (cont 100))))
+101
+boot.lisp:397
+EVAL_SUCCESS 1 1
+(+ 1 (let/cc cont (+ 10 100)))
+111
+boot.lisp:399
+EVAL_SUCCESS 7 1
+(let ([x 10] [sum 0] [cont #f])
+  (let/cc k (set! cont k))
+  (when (< 0 x)
+    (set! sum (+ sum x))
+    (set! x (- x 1))
+    (cont))
+  sum)
+55
+boot.lisp:407
+EVAL_ALL 26
+
+(defmacro shift (k . body)
+  `(*shift (fun (,k) ,@body)))
+
+(defmacro reset body
+  `(*reset (fun () ,@body)))
+
+(def *cont #f)
+
+(defun *abort (thunk)
+  (let1 v (thunk)
+    (*cont v)))
+
+(defun *reset (thunk)
+  (let1 cont *cont
+    (let/cc k
+      (set! *cont (fun (v)
+                    (set! *cont cont)
+                    (k v)))
+      (*abort thunk))))
+
+(defun *shift (f)
+  (let/cc k
+    (*abort (fun ()
+              (f (fun vs
+                   (reset (apply k vs))))))))
+boot.lisp:434
+EVAL_SUCCESS 5 1
+(reset
+  (shift k (append '(1) (k)))
+  (shift k (append '(2) (k)))
+  (shift k (append '(3) (k)))
+  '())
+(1 2 3)
+boot.lisp:440
+EVAL_ALL 2
+
+(defbuiltin eval (s))
+boot.lisp:442
+EVAL_SUCCESS 1 1
+(eval '(+ 1 2 3))
+(#t . 6)
+boot.lisp:444
+EVAL_SUCCESS 1 1
+(car (eval '(error)))
+#f
+boot.lisp:446
+EVAL_ALL 3
+
+(defbuiltin macroexpand (s))
+(defbuiltin macroexpand-1 (s))
+boot.lisp:449
+EVAL_SUCCESS 1 1
+(cdr (macroexpand '(defun foo (x y) (+ x y))))
+(def foo (fun (x y) (+ x y)))
+boot.lisp:451
+EVAL_SUCCESS 1 1
+(def _skip (macro (a . b) b))
+()
+boot.lisp:453
+EVAL_SUCCESS 1 1
+(cdr (macroexpand '(_skip 12 _skip 34 list 56 78)))
+(list 56 78)
+boot.lisp:455
+EVAL_SUCCESS 1 1
+(cdr (macroexpand-1 '(_skip 12 _skip 34 list 56 78)))
+(_skip 34 list 56 78)
+boot.lisp:457
+EVAL_SUCCESS 1 1
+(cdr (macroexpand '(list 12 (_skip 34 list 56 78))))
+(list 12 (list 56 78))
+boot.lisp:459
+EVAL_SUCCESS 1 1
+(cdr (macroexpand-1 '(list 12 (_skip 34 list 56 78))))
+(list 12 (_skip 34 list 56 78))
+boot.lisp:461
+EVAL_SUCCESS 1 1
+(car (macroexpand '(_skip)))
+#f
+boot.lisp:463
+EVAL_ALL 26
+
+;;;;;;;;;
+
+(defbuiltin print strs)
+(defbuiltin newline ())
+
+(defun println strs
+  (apply print strs)
+  (newline))
+
+(defbuiltin inspect (x))
+
+(defun p xs
+  (apply print (map inspect xs))
+  (newline))
+
+(defun count (xs)
+  (let loop ([xs xs] [c 0])
+    (if (nil? xs)
+      c
+      (loop (cdr xs) (+ c 1)))))
+
+(defun nth (n xs)
+  (if (= n 0)
+    (car xs)
+    (nth (- n 1) (cdr xs))))

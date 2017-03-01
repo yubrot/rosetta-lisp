@@ -1,0 +1,227 @@
+> 123
+[0 entry]
+  ldc 123
+
+> "foo"
+[0 entry]
+  ldc "foo"
+
+> foo
+[0 entry]
+  ldv foo
+
+> (foo)
+[0 entry]
+  ldv foo
+  app 0
+
+> (foo bar baz)
+[0 entry]
+  ldv foo
+  ldv bar
+  ldv baz
+  app 2
+
+> (foo (bar (baz)) hoge)
+[0 entry]
+  ldv foo
+  ldv bar
+  ldv baz
+  app 0
+  app 1
+  ldv hoge
+  app 2
+
+> (foo . bar)
+fail
+
+> (a b c . d)
+fail
+
+> (begin)
+[0 entry]
+  ldc ()
+
+> (begin x)
+[0 entry]
+  ldv x
+
+> (begin x y)
+[0 entry]
+  ldv x
+  pop
+  ldv y
+
+> (begin a (b c) d)
+[0 entry]
+  ldv a
+  pop
+  ldv b
+  ldv c
+  app 1
+  pop
+  ldv d
+
+> (def hello 123)
+[0 entry]
+  ldc 123
+  def hello
+  ldc ()
+
+> (def hello (a b))
+[0 entry]
+  ldv a
+  ldv b
+  app 1
+  def hello
+  ldc ()
+
+> (set! goodbye (c d))
+[0 entry]
+  ldv c
+  ldv d
+  app 1
+  set goodbye
+  ldc ()
+
+> (def hello)
+fail
+
+> (def (foo bar) 123)
+fail
+
+> (def "string" 42)
+fail
+
+> (if a b c)
+[0 entry]
+  ldv a
+  sel [1 then] [2 else]
+[1 then]
+  ldv b
+  leave
+[2 else]
+  ldv c
+  leave
+
+> (if a b)
+fail
+
+> (if (a b) (x y) z)
+[0 entry]
+  ldv a
+  ldv b
+  app 1
+  sel [1 then] [2 else]
+[1 then]
+  ldv x
+  ldv y
+  app 1
+  leave
+[2 else]
+  ldv z
+  leave
+
+> (if (if a b c) (if d e f) (if g h i))
+[0 entry]
+  ldv a
+  sel [1 then] [2 else]
+  sel [3 then] [6 else]
+[1 then]
+  ldv b
+  leave
+[2 else]
+  ldv c
+  leave
+[3 then]
+  ldv d
+  sel [4 then] [5 else]
+  leave
+[4 then]
+  ldv e
+  leave
+[5 else]
+  ldv f
+  leave
+[6 else]
+  ldv g
+  sel [7 then] [8 else]
+  leave
+[7 then]
+  ldv h
+  leave
+[8 else]
+  ldv i
+  leave
+
+> (if a b c d)
+fail
+
+> (fun ())
+[0 entry]
+  ldf [1 fun ()]
+[1 fun ()]
+  ldc ()
+  leave
+
+> (fun () 12 34)
+[0 entry]
+  ldf [1 fun ()]
+[1 fun ()]
+  ldc 12
+  pop
+  ldc 34
+  leave
+
+> (fun "x")
+fail
+
+> (fun abc)
+[0 entry]
+  ldf [1 fun abc]
+[1 fun abc]
+  ldc ()
+  leave
+
+> (fun (a b . c))
+[0 entry]
+  ldf [1 fun (a b . c)]
+[1 fun (a b . c)]
+  ldc ()
+  leave
+
+> (fun (x y) z)
+[0 entry]
+  ldf [1 fun (x y)]
+[1 fun (x y)]
+  ldv z
+  leave
+
+> (fun (0))
+fail
+
+> (macro ())
+[0 entry]
+  ldm [1 macro ()]
+[1 macro ()]
+  ldc ()
+
+> (macro (x y) x)
+[0 entry]
+  ldm [1 macro (x y)]
+[1 macro (x y)]
+  ldv x
+
+> (builtin hello)
+[0 entry]
+  ldb hello
+
+> (builtin "hello")
+fail
+
+> '(1 2 3)
+[0 entry]
+  ldc (1 2 3)
+
+> (quote a b)
+fail

@@ -1,0 +1,151 @@
+> 123
+123
+
+> 'hoge
+hoge
+
+> (begin 123 456 789)
+789
+
+> foo
+fail
+
+> (def foo "foo")
+()
+
+> foo
+"foo"
+
+> (def foo "bar")
+()
+
+> foo
+"bar"
+
+> (set! foo "baz")
+()
+
+> foo
+"baz"
+
+> (set! hoge "fuga")
+fail
+
+> (fun () 123)
+<fun>
+
+> ((fun () 123))
+123
+
+> ((fun (a b) a) 12)
+fail
+
+> ((fun (a b) a) 12 34)
+12
+
+> ((fun (a b) a) 12 34 56)
+fail
+
+> ((fun (a . b) b))
+fail
+
+> ((fun (a . b) a) 12)
+12
+
+> ((fun (a . b) b) 12)
+()
+
+> ((fun (a . b) b) 12 34 56)
+(34 56)
+
+> ((fun a a) 12 34)
+(12 34)
+
+> (set! foo #t)
+()
+> ((fun () (def foo #f)))
+()
+> foo
+#t
+
+> ((fun () (set! foo #f)))
+()
+> foo
+#f
+
+> (def _list (fun a a))
+()
+> (_list 1 (_list 2 3) 4)
+(1 (2 3) 4)
+
+> (set! foo 0)
+()
+> (set! foo (_list foo 1))
+()
+> foo
+(0 1)
+
+> (begin
+>   (set! foo 0)
+>   (set! foo (_list foo 1))
+>   (set! foo (_list foo 2))
+>   (set! foo (_list foo 3))
+>   foo)
+(((0 1) 2) 3)
+
+> (if #t 123 456)
+123
+
+> (if #f 123 456)
+456
+
+> (if "anything except #f" 123 456)
+123
+
+> (if () 123 456)
+123
+
+> (if #t (def hoge "fuga") (def hoge "fuga"))
+()
+> hoge
+fail
+
+> (begin
+>   (set! foo 0)
+>   (if #t
+>     (set! foo (_list foo 1))
+>     (set! foo (_list foo 2)))
+>   foo)
+(0 1)
+
+> (begin
+>   (set! foo 0)
+>   (if #f
+>     (set! foo (_list foo 1))
+>     (set! foo (_list foo 2)))
+>   foo)
+(0 2)
+
+> (macro (a b) a)
+<macro>
+
+> ((macro (a b) a) 12 34)
+fail
+
+> (def _skip (macro (a . b) b))
+()
+> (_skip 12 _list 34 56)
+(34 56)
+
+> (set! foo #t)
+()
+> (_skip (set! foo #f) _list)
+()
+> foo
+#t
+
+> (_skip 12 _skip 34 _list 56 78)
+(56 78)
+
+> (_list 12 (_skip 34 _list 56 78))
+(12 (56 78))

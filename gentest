@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby
+
+Block = Struct.new("Block", :label, :text, :location)
+
+@buf = ""
+
+def main()
+  interpret = -> method { -> input, result {
+    if result == "fail"
+      "#{method}_FAILURE #{input.lines.count}\n#{input}"
+    else
+      "#{method}_SUCCESS #{input.lines.count} #{result.lines.count}\n#{input}\n#{result}"
+    end
+  } }
+
+  build "testsuites/syntax", {
+    input: /^> ?(.*)$/
+  }, {
+    [:input, :raw] => interpret["PARSE"]
+  }
+
+  build "testsuites/compiler", {
+    input: /^> ?(.*)$/
+  }, {
+    [:input, :raw] => interpret["COMPILE"]
+  }
+
+  build "testsuites/vm", {
+    input: /^> ?(.*)$/
+  }, {
+    [:input, :raw] => interpret["EVAL"]
+  }
+
+  build "boot.lisp", {
+    test_input: /^;! ?> ?(.*)$/,
+    test_result: /^;! ?(.*)$/
+  }, {
+    [:raw] => -> raw { "EVAL_ALL #{raw.lines.count}\n#{raw}" },
+    [:test_input, :test_result] => interpret["EVAL"]
+  }
+
+  open("test", "w") {|f| f.write @buf }
+end
+
+def build(file, p, e)
+  emit(read_block(file, p), e)
+end
+
+def read_block(file, patterns)
+  blocks = []
+  last = nil
+
+  IO.readlines(file).each_with_index do |line, i|
+    label = :raw
+    line.chomp!
+    for lbl, pat in patterns do
+      next if pat !~ line
+      label, line = lbl, $1
+      break
+    end
+
+    if !last || last.label != label
+      last = Block.new(label, line, "#{file}:#{i + 1}")
+      blocks << last
+    else
+      last.text << "\n" + line
+    end
+  end
+
+  blocks.each {|block| block.text.chomp! }
+end
+
+def emit(blocks, patterns)
+  while !blocks.empty?
+    match = false
+    for labels, body in patterns do
+      next if blocks.size < labels.size
+      next unless blocks.take(labels.size).zip(labels).all? {|block, label| block.label == label}
+      @buf << "#{blocks[0].location}\n"
+      @buf << body.(*blocks.take(labels.size).map(&:text)) + "\n"
+      blocks = blocks.drop(labels.size)
+      match = true
+      break
+    end
+    raise "Cannot handle blocks: #{blocks}" unless match
+  end
+end
+
+main
