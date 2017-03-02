@@ -226,7 +226,15 @@
 ;! 3
 ;! > (cond [#f 1] [#f 2] [#f 3])
 ;! ()
-; TODO tests for side effects
+;! > (def _r ())
+;! ()
+;! > (cond
+;! >   [(begin (set! _r (cons 1 _r)) #f) (set! _r (cons 2 _r))]
+;! >   [(begin (set! _r (cons 3 _r)) #t) (set! _r (cons 4 _r))]
+;! >   [(begin (set! _r (cons 5 _r)) #t) (set! _r (cons 6 _r))])
+;! ()
+;! > _r
+;! (4 3 1)
 
 (defmacro and values
   (cond
@@ -247,7 +255,16 @@
 ;! #f
 ;! > (and 123 456 789)
 ;! 789
-; TODO tests for side effects
+;! > (def _r ())
+;! ()
+;! > (and
+;! >   (begin (set! _r (cons 1 _r)) 123)
+;! >   (begin (set! _r (cons 2 _r)) 456)
+;! >   (begin (set! _r (cons 3 _r)) #f)
+;! >   (begin (set! _r (cons 4 _r)) 789))
+;! #f
+;! > _r
+;! (3 2 1)
 
 (defmacro or values
   (cond
@@ -268,7 +285,16 @@
 ;! 456
 ;! > (or 123 456 789)
 ;! 123
-; TODO tests for side effects
+;! > (def _r ())
+;! ()
+;! > (or
+;! >   (begin (set! _r (cons 1 _r)) #f)
+;! >   (begin (set! _r (cons 2 _r)) #f)
+;! >   (begin (set! _r (cons 3 _r)) 123)
+;! >   (begin (set! _r (cons 4 _r)) 456))
+;! 123
+;! > _r
+;! (3 2 1)
 
 (defun all (f xs)
   (if (nil? xs)
@@ -446,6 +472,8 @@
 
 (defbuiltin macroexpand (s))
 (defbuiltin macroexpand-1 (s))
+;! > (macroexpand 123)
+;! (#t . 123)
 ;! > (cdr (macroexpand '(defun foo (x y) (+ x y))))
 ;! (def foo (fun (x y) (+ x y)))
 ;! > (def _skip (macro (a . b) b))
@@ -481,8 +509,12 @@
     (if (nil? xs)
       c
       (loop (cdr xs) (+ c 1)))))
+;! > (count (list 1 3 4 5 6))
+;! 5
 
 (defun nth (n xs)
   (if (= n 0)
     (car xs)
     (nth (- n 1) (cdr xs))))
+;! > (nth 3 (list 9 8 7 6 5))
+;! 6

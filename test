@@ -993,8 +993,22 @@ EVAL_SUCCESS 1 1
 (cond [#f 1] [#f 2] [#f 3])
 ()
 boot.lisp:229
-EVAL_ALL 11
-; TODO tests for side effects
+EVAL_SUCCESS 1 1
+(def _r ())
+()
+boot.lisp:231
+EVAL_SUCCESS 4 1
+(cond
+  [(begin (set! _r (cons 1 _r)) #f) (set! _r (cons 2 _r))]
+  [(begin (set! _r (cons 3 _r)) #t) (set! _r (cons 4 _r))]
+  [(begin (set! _r (cons 5 _r)) #t) (set! _r (cons 6 _r))])
+()
+boot.lisp:236
+EVAL_SUCCESS 1 1
+_r
+(4 3 1)
+boot.lisp:238
+EVAL_ALL 10
 
 (defmacro and values
   (cond
@@ -1005,29 +1019,44 @@ EVAL_ALL 11
                          (list 'if tmp (cons 'and (cdr values)) tmp))
                    (car values)))
            (gensym))]))
-boot.lisp:240
+boot.lisp:248
 EVAL_SUCCESS 1 1
 (and)
 #t
-boot.lisp:242
+boot.lisp:250
 EVAL_SUCCESS 1 1
 (and 123)
 123
-boot.lisp:244
+boot.lisp:252
 EVAL_SUCCESS 1 1
 (and 123 456)
 456
-boot.lisp:246
+boot.lisp:254
 EVAL_SUCCESS 1 1
 (and #f 456)
 #f
-boot.lisp:248
+boot.lisp:256
 EVAL_SUCCESS 1 1
 (and 123 456 789)
 789
-boot.lisp:250
-EVAL_ALL 11
-; TODO tests for side effects
+boot.lisp:258
+EVAL_SUCCESS 1 1
+(def _r ())
+()
+boot.lisp:260
+EVAL_SUCCESS 5 1
+(and
+  (begin (set! _r (cons 1 _r)) 123)
+  (begin (set! _r (cons 2 _r)) 456)
+  (begin (set! _r (cons 3 _r)) #f)
+  (begin (set! _r (cons 4 _r)) 789))
+#f
+boot.lisp:266
+EVAL_SUCCESS 1 1
+_r
+(3 2 1)
+boot.lisp:268
+EVAL_ALL 10
 
 (defmacro or values
   (cond
@@ -1038,48 +1067,63 @@ EVAL_ALL 11
                          (list 'if tmp tmp (cons 'or (cdr values))))
                    (car values)))
            (gensym))]))
-boot.lisp:261
+boot.lisp:278
 EVAL_SUCCESS 1 1
 (or)
 #f
-boot.lisp:263
+boot.lisp:280
 EVAL_SUCCESS 1 1
 (or 123)
 123
-boot.lisp:265
+boot.lisp:282
 EVAL_SUCCESS 1 1
 (or 123 456)
 123
-boot.lisp:267
+boot.lisp:284
 EVAL_SUCCESS 1 1
 (or #f 456)
 456
-boot.lisp:269
+boot.lisp:286
 EVAL_SUCCESS 1 1
 (or 123 456 789)
 123
-boot.lisp:271
-EVAL_ALL 7
-; TODO tests for side effects
+boot.lisp:288
+EVAL_SUCCESS 1 1
+(def _r ())
+()
+boot.lisp:290
+EVAL_SUCCESS 5 1
+(or
+  (begin (set! _r (cons 1 _r)) #f)
+  (begin (set! _r (cons 2 _r)) #f)
+  (begin (set! _r (cons 3 _r)) 123)
+  (begin (set! _r (cons 4 _r)) 456))
+123
+boot.lisp:296
+EVAL_SUCCESS 1 1
+_r
+(3 2 1)
+boot.lisp:298
+EVAL_ALL 6
 
 (defun all (f xs)
   (if (nil? xs)
     #t
     (and (f (car xs))
          (all f (cdr xs)))))
-boot.lisp:278
+boot.lisp:304
 EVAL_SUCCESS 1 1
 (all num? (list))
 #t
-boot.lisp:280
+boot.lisp:306
 EVAL_SUCCESS 1 1
 (all num? (list 1 2 3))
 #t
-boot.lisp:282
+boot.lisp:308
 EVAL_SUCCESS 1 1
 (all num? (list 1 "2" 3))
 #f
-boot.lisp:284
+boot.lisp:310
 EVAL_ALL 6
 
 (defun any (f xs)
@@ -1087,23 +1131,23 @@ EVAL_ALL 6
     #f
     (or (f (car xs))
         (any f (cdr xs)))))
-boot.lisp:290
+boot.lisp:316
 EVAL_SUCCESS 1 1
 (any num? (list))
 #f
-boot.lisp:292
+boot.lisp:318
 EVAL_SUCCESS 1 1
 (any num? (list 1 2 3))
 #t
-boot.lisp:294
+boot.lisp:320
 EVAL_SUCCESS 1 1
 (any num? (list "1" 2 "3"))
 #t
-boot.lisp:296
+boot.lisp:322
 EVAL_SUCCESS 1 1
 (any num? (list "1" "2" "3"))
 #f
-boot.lisp:298
+boot.lisp:324
 EVAL_ALL 51
 
 (defmacro quasiquote ls
@@ -1156,87 +1200,87 @@ EVAL_ALL 51
     (let ([args (map car binds)])
       `(let ,binds (letrec ([,sym (fun ,args ,@body)]) (,sym ,@args))))
     (error "Syntax error: expected (named-let name ((name expr)...) body...)")))
-boot.lisp:350
+boot.lisp:376
 EVAL_SUCCESS 1 1
 (let ([_x 2] [_y 3]) (* _x _y))
 6
-boot.lisp:352
+boot.lisp:378
 EVAL_FAILURE 1
 _x
-boot.lisp:354
+boot.lisp:380
 EVAL_SUCCESS 4 1
 (let _loop ([x 10] [sum 0])
   (if (< 0 x)
     (_loop (- x 1) (+ sum x))
     sum))
 55
-boot.lisp:359
+boot.lisp:385
 EVAL_FAILURE 1
 _loop
-boot.lisp:361
+boot.lisp:387
 EVAL_SUCCESS 1 1
 (let ([x 3] [x (* x 4)] [x (+ x 5)]) x)
 17
-boot.lisp:363
+boot.lisp:389
 EVAL_SUCCESS 3 1
 (letrec ([even? (fun (x) (if (= (% x 2) 0) #t (odd? (- x 1))))]
          [odd? (fun (x) (if (= (% x 2) 0) #f (even? (- x 1))))])
   (list (even? 4) (even? 5) (odd? 6) (odd? 7)))
 (#t #f #f #t)
-boot.lisp:367
+boot.lisp:393
 EVAL_ALL 3
 
 (defmacro when (cond . body)
   `(if ,cond (begin ,@body) ()))
-boot.lisp:370
+boot.lisp:396
 EVAL_SUCCESS 1 1
 (when #f 123 456)
 ()
-boot.lisp:372
+boot.lisp:398
 EVAL_SUCCESS 1 1
 (when #t 123 456)
 456
-boot.lisp:374
+boot.lisp:400
 EVAL_ALL 3
 
 (defmacro unless (cond . body)
   `(if ,cond () (begin ,@body)))
-boot.lisp:377
+boot.lisp:403
 EVAL_SUCCESS 1 1
 (unless #f 123 456)
 456
-boot.lisp:379
+boot.lisp:405
 EVAL_SUCCESS 1 1
 (unless #t 123 456)
 ()
-boot.lisp:381
+boot.lisp:407
 EVAL_ALL 3
 
 (defmacro let1 (var expr . body)
   `(let ([,var ,expr]) ,@body))
-boot.lisp:384
+boot.lisp:410
 EVAL_SUCCESS 4 1
 (let1 x 3
   (let1 x (* x 4)
     (let1 x (+ x 5)
       x)))
 17
-boot.lisp:389
+boot.lisp:415
 EVAL_ALL 5
 
 (defbuiltin call/cc (fun))
 
 (defmacro let/cc (k . body)
   `(call/cc (fun (,k) ,@body)))
-boot.lisp:395
+boot.lisp:421
 EVAL_SUCCESS 1 1
 (+ 1 (let/cc cont (+ 10 (cont 100))))
 101
-boot.lisp:397
+boot.lisp:423
 EVAL_SUCCESS 1 1
 (+ 1 (let/cc cont (+ 10 100)))
 111
-boot.lisp:399
+boot.lisp:425
 EVAL_SUCCESS 7 1
 (let ([x 10] [sum 0] [cont #f])
   (let/cc k (set! cont k))
@@ -1246,7 +1290,7 @@ EVAL_SUCCESS 7 1
     (cont))
   sum)
 55
-boot.lisp:407
+boot.lisp:433
 EVAL_ALL 26
 
 (defmacro shift (k . body)
@@ -1274,7 +1318,7 @@ EVAL_ALL 26
     (*abort (fun ()
               (f (fun vs
                    (reset (apply k vs))))))))
-boot.lisp:434
+boot.lisp:460
 EVAL_SUCCESS 5 1
 (reset
   (shift k (append '(1) (k)))
@@ -1282,53 +1326,57 @@ EVAL_SUCCESS 5 1
   (shift k (append '(3) (k)))
   '())
 (1 2 3)
-boot.lisp:440
+boot.lisp:466
 EVAL_ALL 2
 
 (defbuiltin eval (s))
-boot.lisp:442
+boot.lisp:468
 EVAL_SUCCESS 1 1
 (eval '(+ 1 2 3))
 (#t . 6)
-boot.lisp:444
+boot.lisp:470
 EVAL_SUCCESS 1 1
 (car (eval '(error)))
 #f
-boot.lisp:446
+boot.lisp:472
 EVAL_ALL 3
 
 (defbuiltin macroexpand (s))
 (defbuiltin macroexpand-1 (s))
-boot.lisp:449
+boot.lisp:475
+EVAL_SUCCESS 1 1
+(macroexpand 123)
+(#t . 123)
+boot.lisp:477
 EVAL_SUCCESS 1 1
 (cdr (macroexpand '(defun foo (x y) (+ x y))))
 (def foo (fun (x y) (+ x y)))
-boot.lisp:451
+boot.lisp:479
 EVAL_SUCCESS 1 1
 (def _skip (macro (a . b) b))
 ()
-boot.lisp:453
+boot.lisp:481
 EVAL_SUCCESS 1 1
 (cdr (macroexpand '(_skip 12 _skip 34 list 56 78)))
 (list 56 78)
-boot.lisp:455
+boot.lisp:483
 EVAL_SUCCESS 1 1
 (cdr (macroexpand-1 '(_skip 12 _skip 34 list 56 78)))
 (_skip 34 list 56 78)
-boot.lisp:457
+boot.lisp:485
 EVAL_SUCCESS 1 1
 (cdr (macroexpand '(list 12 (_skip 34 list 56 78))))
 (list 12 (list 56 78))
-boot.lisp:459
+boot.lisp:487
 EVAL_SUCCESS 1 1
 (cdr (macroexpand-1 '(list 12 (_skip 34 list 56 78))))
 (list 12 (_skip 34 list 56 78))
-boot.lisp:461
+boot.lisp:489
 EVAL_SUCCESS 1 1
 (car (macroexpand '(_skip)))
 #f
-boot.lisp:463
-EVAL_ALL 26
+boot.lisp:491
+EVAL_ALL 21
 
 ;;;;;;;;;
 
@@ -1350,8 +1398,18 @@ EVAL_ALL 26
     (if (nil? xs)
       c
       (loop (cdr xs) (+ c 1)))))
+boot.lisp:512
+EVAL_SUCCESS 1 1
+(count (list 1 3 4 5 6))
+5
+boot.lisp:514
+EVAL_ALL 5
 
 (defun nth (n xs)
   (if (= n 0)
     (car xs)
     (nth (- n 1) (cdr xs))))
+boot.lisp:519
+EVAL_SUCCESS 1 1
+(nth 3 (list 9 8 7 6 5))
+6
