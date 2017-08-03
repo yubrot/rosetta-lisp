@@ -119,17 +119,6 @@
 ;! > (list (% 5) (% 5 3))
 ;! (5 2)
 
-(defbuiltin concat strs)
-(defbuiltin length (str)) ; byte size
-;! > (concat)
-;! ""
-;! > (concat "foo" "bar" "baz")
-;! "foobarbaz"
-;! > (length "foobar")
-;! 6
-;! > (length "foobar" "baz")
-;! fail
-
 (defbuiltin = xs)
 ;! > (list (=) (= 1) (= 1 1) (= 1 2) (= 1 1 1) (= 1 1 2))
 ;! (#t #t #t #f #t #f)
@@ -170,6 +159,10 @@
 ;! > (map (fun (a) (* a 3)) (list 1 2 5 4))
 ;! (3 6 15 12)
 
+(def for (flip map))
+;! > (for (list 1 2 3) (fun (a) (* a a)))
+;! (1 4 9)
+
 (defun foldl (f i xs)
   (if (nil? xs)
     i
@@ -191,13 +184,31 @@
   (if (nil? a)
     b
     (cons (car a) (*append (cdr a) b))))
-;! > (append (list 1 2 3) (list 4 5 6))
-;! (1 2 3 4 5 6)
+;! > (append (list 1 2 3) (list 4 5 6) (list 7 8))
+;! (1 2 3 4 5 6 7 8)
 
-(defun rev (ls)
+(defun reverse (ls)
   (foldl (flip cons) () ls))
-;! > (rev (list 1 2 4 5))
+;! > (reverse (list 1 2 4 5))
 ;! (5 4 2 1)
+
+(defun nth (n xs)
+  (if (= n 0)
+    (car xs)
+    (nth (- n 1) (cdr xs))))
+;! > (nth 3 (list 9 8 7 6 5))
+;! 6
+
+(defun iota (a b)
+  (if (< a b)
+    (cons a (iota (+ a 1) b))
+    '()))
+;! > (iota 0 5)
+;! (0 1 2 3 4)
+;! > (iota 2 4)
+;! (2 3)
+;! > (iota 3 3)
+;! ()
 
 (defun not (x)
   (if x #f #t))
@@ -489,7 +500,73 @@
 ;! > (car (macroexpand '(_skip)))
 ;! #f
 
-;;;;;;;;;
+(def list-concat append)
+
+(defun list-count (xs)
+  (let loop ([xs xs] [c 0])
+    (if (nil? xs)
+      c
+      (loop (cdr xs) (+ c 1)))))
+;! > (list-count (list 1 3 4 5 6))
+;! 5
+
+(def list-ref (flip nth))
+;! > (list-ref (list 4 3 2) 0)
+;! 4
+
+(defbuiltin str bytes)
+;! > (str 102)
+;! "f"
+;! > (str 102 111 111 98 97 114)
+;! "foobar"
+
+(defbuiltin str-ref (str n))
+;! > (str-ref "foobar" 0)
+;! 102
+;! > (str-ref "foobar" 1)
+;! 111
+
+(defbuiltin str-bytesize (str))
+;! > (str-bytesize "foobar")
+;! 6
+;! > (str-bytesize "foobar" "baz")
+;! fail
+;! > (str-bytesize "日本語")
+;! 9
+
+(defun str->list (str)
+  (map (fun (n) (str-ref str n)) (iota 0 (str-bytesize str))))
+;! > (str->list "foobar")
+;! (102 111 111 98 97 114)
+
+(defun list->str (list)
+  (apply str list))
+
+(defbuiltin str-concat strs)
+;! > (str-concat)
+;! ""
+;! > (str-concat "foo" "bar" "baz")
+;! "foobarbaz"
+
+(defbuiltin substr (str n bytesize))
+;! > (substr "foobar" 0 3)
+;! "foo"
+;! > (substr "foobar" 2 3)
+;! "oba"
+;! > (substr "foobar" 1 4)
+;! "ooba"
+;! > (str->list (substr "日本語" 0 3))
+;! (230 151 165)
+
+(defbuiltin num->str (num))
+;! > (num->str 123)
+;! "123"
+
+(defbuiltin str->num (num))
+;! > (str->num "456")
+;! 456
+
+;;;;;;;;;;;;;
 
 (defbuiltin print strs)
 (defbuiltin newline ())
@@ -504,17 +581,3 @@
   (apply print (map inspect xs))
   (newline))
 
-(defun count (xs)
-  (let loop ([xs xs] [c 0])
-    (if (nil? xs)
-      c
-      (loop (cdr xs) (+ c 1)))))
-;! > (count (list 1 3 4 5 6))
-;! 5
-
-(defun nth (n xs)
-  (if (= n 0)
-    (car xs)
-    (nth (- n 1) (cdr xs))))
-;! > (nth 3 (list 9 8 7 6 5))
-;! 6

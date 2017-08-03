@@ -18,14 +18,6 @@
 
 ;;;;;;;;;;;
 
-(defun for (l f)
-  (map f l))
-
-(defun iota (a b)
-  (if (< a b)
-    (cons a (iota (+ a 1) b))
-    '()))
-
 (defun gol-step (h w board)
   (defun at (y x)
     (if (or (not (<= 0 y (- h 1)))

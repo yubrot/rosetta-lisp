@@ -5,14 +5,14 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 
 ## Required syntax
 
-* `(def sym x)` - Evaluates `x`, and then binds `sym` to the result of `x` on the current environment. Produces `()`.
+* `(def sym x)` - Evaluates `x`, and then binds a new variable named `sym` to the result of `x` on the current environment. Produces `()`.
 * `(set! sym x)` - Evaluates `x`, and then overwrites a variable named `sym` on the current environment. Produces `()`.
 * `(begin ...)` - Evaluates arguments sequentially and produces the result of the last argument.
 * `(if cond a b)` - Evaluates `cond`, and then evaluates `a` if the result of `cond` is not `#f`, or otherwise evaluates `b`. Produces the result of `a` or `b`.
-* `(fun params ...)` - Produces a function.
-* `(macro params ...)` - Produces a macro.
-* `(builtin sym)` - Produces a builtin function named `sym`.
-* `(quote x)` - Produces `x` as data without evaluating it.
+* `(fun params ...)` - Creates a function and produces it.
+* `(macro params ...)` - Creates a macro and produces it.
+* `(builtin sym)` - Captures a builtin function named `sym` and produces it.
+* `(quote x)` - Produces a value represented by `x`.
 
 ## Required builtin functions
 
@@ -44,9 +44,6 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 (/ num nums...)
 (% num nums...)
 
-(concat strs...)
-(length str)
-
 (= xs...)
 (< nums-or-strs...)
 (> nums-or-strs...)
@@ -58,6 +55,14 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 (eval s)
 (macroexpand s)
 (macroexpand-1 s)
+
+(str bytes...)
+(str-ref str n)
+(str-bytesize str)
+(str-concat strs...)
+(substr str n bytesize)
+(num->str num)
+(str->num str)
 
 (print strs)
 (newline)
