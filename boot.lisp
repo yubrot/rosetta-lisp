@@ -67,6 +67,7 @@
 (defbuiltin bool? (x))
 (defbuiltin proc? (x))
 (defbuiltin meta? (x))
+(defbuiltin port? (x))
 ;! > (num? 123)
 ;! #t
 ;! > (num? 12 34)
@@ -475,30 +476,72 @@
 ;! >   '())
 ;! (1 2 3)
 
+(defun success (v) (cons #t v))
+(defun failure (v) (cons #f v))
+
+(defun success? (v) (car v))
+(defun failure? (v) (not (car v)))
+
+(defun force-success (v)
+  (if (success? v)
+    (cdr v)
+    (error (cdr v))))
+
+;! > (force-success (success 123))
+;! 123
+;! > (force-success (failure "error"))
+;! fail
+
 (defbuiltin eval (s))
-;! > (eval '(+ 1 2 3))
-;! (#t . 6)
-;! > (car (eval '(error)))
-;! #f
+;! > (force-success (eval '(+ 1 2 3)))
+;! 6
+;! > (force-success (eval '(error)))
+;! fail
 
 (defbuiltin macroexpand (s))
 (defbuiltin macroexpand-1 (s))
-;! > (macroexpand 123)
-;! (#t . 123)
-;! > (cdr (macroexpand '(defun foo (x y) (+ x y))))
+;! > (force-success (macroexpand 123))
+;! 123
+;! > (force-success (macroexpand '(defun foo (x y) (+ x y))))
 ;! (def foo (fun (x y) (+ x y)))
 ;! > (def _skip (macro (a . b) b))
 ;! ()
-;! > (cdr (macroexpand '(_skip 12 _skip 34 list 56 78)))
+;! > (force-success (macroexpand '(_skip 12 _skip 34 list 56 78)))
 ;! (list 56 78)
-;! > (cdr (macroexpand-1 '(_skip 12 _skip 34 list 56 78)))
+;! > (force-success (macroexpand-1 '(_skip 12 _skip 34 list 56 78)))
 ;! (_skip 34 list 56 78)
-;! > (cdr (macroexpand '(list 12 (_skip 34 list 56 78))))
+;! > (force-success (macroexpand '(list 12 (_skip 34 list 56 78))))
 ;! (list 12 (list 56 78))
-;! > (cdr (macroexpand-1 '(list 12 (_skip 34 list 56 78))))
+;! > (force-success (macroexpand-1 '(list 12 (_skip 34 list 56 78))))
 ;! (list 12 (_skip 34 list 56 78))
-;! > (car (macroexpand '(_skip)))
-;! #f
+;! > (force-success (macroexpand '(_skip)))
+;! fail
+
+(def unit success)
+
+(defun bind (m f)
+  (if (success? m) (f (cdr m)) m))
+
+(defmacro reify body
+  `(reset (unit (begin ,@body))))
+
+(defun reflect (m)
+  (shift k (bind m k)))
+
+;! > (reify 123)
+;! (#t . 123)
+;! > (reify (+ (reflect (success 123)) 456))
+;! (#t . 579)
+;! > (reify (+ (reflect (failure "error")) 456))
+;! (#f . "error")
+;! > (reify (let1 a (reify 123) (+ (reflect a) 1)))
+;! (#t . 124)
+;! > (reify (let1 a (reify (reflect (success 123))) (+ (reflect a) 1)))
+;! (#t . 124)
+;! > (reify (let1 a (reify (reflect (failure "error"))) (+ (reflect a) 1)))
+;! (#f . "error")
+;! > (reify (let1 a (reify (reflect (failure "error"))) a))
+;! (#t #f . "error")
 
 (def list-concat append)
 
@@ -510,6 +553,16 @@
 ;! > (list-count (list 1 3 4 5 6))
 ;! 5
 
+(defun list-lookup (k ls)
+  (cond
+    [(nil? ls) ()]
+    [(= (caar ls) k) (cdar ls)]
+    [else (list-lookup k (cdr ls))]))
+;! > (list-lookup 2 '((1 . "foo") (2 . "bar") (3 . "baz")))
+;! "bar"
+;! > (list-lookup 5 '((1 . "foo") (2 . "bar") (3 . "baz")))
+;! ()
+
 (def list-ref (flip nth))
 ;! > (list-ref (list 4 3 2) 0)
 ;! 4
@@ -519,12 +572,16 @@
 ;! "f"
 ;! > (str 102 111 111 98 97 114)
 ;! "foobar"
+;! > (str 260)
+;! fail
 
 (defbuiltin str-ref (str n))
 ;! > (str-ref "foobar" 0)
 ;! 102
 ;! > (str-ref "foobar" 1)
 ;! 111
+;! > (str-ref "foobar" 8)
+;! ()
 
 (defbuiltin str-bytesize (str))
 ;! > (str-bytesize "foobar")
@@ -541,6 +598,8 @@
 
 (defun list->str (list)
   (apply str list))
+;! > (list->str (list 102 111 111 98 97 114))
+;! "foobar"
 
 (defbuiltin str-concat strs)
 ;! > (str-concat)
@@ -557,6 +616,12 @@
 ;! "ooba"
 ;! > (str->list (substr "日本語" 0 3))
 ;! (230 151 165)
+;! > (substr "foobar" 1 10)
+;! fail
+
+(defbuiltin sym->str (sym))
+;! > (sym->str 'foo-bar)
+;! "foo-bar"
 
 (defbuiltin num->str (num))
 ;! > (num->str 123)
@@ -565,19 +630,163 @@
 (defbuiltin str->num (num))
 ;! > (str->num "456")
 ;! 456
+;! > (str->num "foo")
+;! ()
 
-;;;;;;;;;;;;;
+(defun str-escape (str)
+  (list->str (*bytes-escape (str->list str))))
 
-(defbuiltin print strs)
-(defbuiltin newline ())
+(defun *bytes-escape (bytes)
+  (if (nil? bytes)
+    ()
+    (let ([l (car bytes)]
+          [r (*bytes-escape (cdr bytes))])
+      (cond
+        [(= l 92) (append '(92  92) r)] ; \\
+        [(= l  9) (append '(92 116) r)] ; \t
+        [(= l 10) (append '(92 110) r)] ; \n
+        [(= l 34) (append '(92  34) r)] ; \"
+        [else (cons l r)]))))
+
+;! > (str-escape "foo")
+;! "foo"
+;! > (str-escape "foo\"bar")
+;! "foo\\\"bar"
+;! > (str-escape "\t\t\n")
+;! "\\t\\t\\n"
+;! > (str-escape "peo\\ple")
+;! "peo\\\\ple"
+
+(defun inspect (x)
+  (cond
+    [(num? x) (num->str x)]
+    [(sym? x) (sym->str x)]
+    [(str? x) (str-concat "\"" (str-escape x) "\"")]
+    [(cons? x) (let ([l (car x)]
+                     [r (cdr x)]
+                     [a (list-lookup l *syntax-sugar)])
+                 (if (and (not (nil? a)) (cons? r) (nil? (cdr r)))
+                   (str-concat a (inspect (car r)))
+                   (str-concat "(" (*inspect-cons l r) ")")))]
+    [(nil? x) "()"]
+    [(= #t x) "#t"]
+    [(= #f x) "#f"]
+    [(proc? x) "<proc>"]
+    [(meta? x) "<meta>"]
+    [(port? x) "<port>"]
+    [else (error)]))
+
+(def *syntax-sugar
+  '((quote . "'")
+    (quasiquote . "`")
+    (unquote . ",")
+    (unquote-splicing . ",@")))
+
+(defun *inspect-cons (a b)
+  (cond
+    [(nil? b) (inspect a)]
+    [(cons? b) (str-concat (inspect a) " " (*inspect-cons (car b) (cdr b)))]
+    [else (str-concat (inspect a) " . " (inspect b))]))
+
+;! > (inspect 123)
+;! "123"
+;! > (inspect 'foo)
+;! "foo"
+;! > (inspect "Hello, World!\n")
+;! "\"Hello, World!\\n\""
+;! > (inspect ())
+;! "()"
+;! > (inspect '(1))
+;! "(1)"
+;! > (inspect '(1 a "b"))
+;! "(1 a \"b\")"
+;! > (inspect '(foo . bar))
+;! "(foo . bar)"
+;! > (inspect '(foo bar . baz))
+;! "(foo bar . baz)"
+;! > (map inspect (list ''foo ''(bar baz)))
+;! ("'foo" "'(bar baz)")
+;! > (inspect '`(foo ,bar ,@baz))
+;! "`(foo ,bar ,@baz)"
+;! > (inspect '(quote foo bar))
+;! "(quote foo bar)"
+;! > (inspect '(quote . foo))
+;! "(quote . foo)"
+;! > (map inspect '(#t #f))
+;! ("#t" "#f")
+;! > (map inspect (list (fun ()) = (macro ()) def))
+;! ("<proc>" "<proc>" "<meta>" "<meta>")
+
+(defbuiltin open (filepath mode))
+(defbuiltin close (port))
+
+(def stdin ((builtin stdin)))
+(def stdout ((builtin stdout)))
+(def stderr ((builtin stderr)))
+
+;! > (map inspect (list stdin stdout stderr))
+;! ("<port>" "<port>" "<port>")
+
+(defbuiltin read-byte (port))
+(defbuiltin read-str (size port))
+(defbuiltin read-line (port))
+
+(defun read-all (port)
+  (reify
+    (let loop ([buf ""])
+      (let ([str-read (reflect (read-str 4096 port))])
+        (if (= 'eof str-read)
+          buf
+          (loop (str-concat buf str-read)))))))
+
+(defun open-read (filepath)
+  (reify
+    (let ([port (reflect (open filepath "r"))]
+          [r (reflect (read-all port))])
+      (reflect (close port))
+      r)))
+
+(defun get-byte () (force-success (read-byte stdin)))
+(defun get-line () (force-success (read-line stdin)))
+(defun get-all () (force-success (read-all stdin)))
+
+(defbuiltin write-byte (byte port))
+(defbuiltin write-str (str port))
+(defbuiltin write-line (str port))
+
+(defun write-all (str port)
+  (reify
+    (let loop ([buf str])
+      (let ([bytesize-wrote (reflect (write-str buf port))]
+            [bytesize-rest (- (str-bytesize buf) bytesize-wrote)])
+        (if (= 0 bytesize-rest)
+          ()
+          (loop (substr buf bytesize-wrote bytesize-rest)))))))
+
+(defun write-newline (port)
+  (write-line "" port))
+
+(defun open-write (filepath str)
+  (reify
+    (let ([port (reflect (open filepath "w"))]
+          [r (reflect (write-all str port))])
+      (reflect (close port))
+      r)))
+
+(defun put-byte (byte) (force-success (write-byte byte stdout)))
+(defun put-line (str) (force-success (write-line str stdout)))
+(defun put-all (str) (force-success (write-all str stdout)))
+(defun put-newline () (force-success (write-newline stdout)))
+
+(defun print strs
+  (map put-all strs)
+  ())
 
 (defun println strs
-  (apply print strs)
-  (newline))
-
-(defbuiltin inspect (x))
+  (map put-all strs)
+  (put-newline)
+  ())
 
 (defun p xs
-  (apply print (map inspect xs))
-  (newline))
+  (apply println (map inspect xs)))
 
