@@ -517,30 +517,30 @@
 ;! > (force-success (macroexpand '(_skip)))
 ;! fail
 
-(def unit success)
+(def result-unit success)
 
-(defun bind (m f)
+(defun result-bind (m f)
   (if (success? m) (f (cdr m)) m))
 
-(defmacro reify body
-  `(reset (unit (begin ,@body))))
+(defmacro result-reify body
+  `(reset (result-unit (begin ,@body))))
 
-(defun reflect (m)
-  (shift k (bind m k)))
+(defun result-reflect (m)
+  (shift k (result-bind m k)))
 
-;! > (reify 123)
+;! > (result-reify 123)
 ;! (#t . 123)
-;! > (reify (+ (reflect (success 123)) 456))
+;! > (result-reify (+ (result-reflect (success 123)) 456))
 ;! (#t . 579)
-;! > (reify (+ (reflect (failure "error")) 456))
+;! > (result-reify (+ (result-reflect (failure "error")) 456))
 ;! (#f . "error")
-;! > (reify (let1 a (reify 123) (+ (reflect a) 1)))
+;! > (result-reify (let1 a (result-reify 123) (+ (result-reflect a) 1)))
 ;! (#t . 124)
-;! > (reify (let1 a (reify (reflect (success 123))) (+ (reflect a) 1)))
+;! > (result-reify (let1 a (result-reify (result-reflect (success 123))) (+ (result-reflect a) 1)))
 ;! (#t . 124)
-;! > (reify (let1 a (reify (reflect (failure "error"))) (+ (reflect a) 1)))
+;! > (result-reify (let1 a (result-reify (result-reflect (failure "error"))) (+ (result-reflect a) 1)))
 ;! (#f . "error")
-;! > (reify (let1 a (reify (reflect (failure "error"))) a))
+;! > (result-reify (let1 a (result-reify (result-reflect (failure "error"))) a))
 ;! (#t #f . "error")
 
 (def list-concat append)
@@ -717,6 +717,20 @@
 ;! > (map inspect (list (fun ()) = (macro ()) def))
 ;! ("<proc>" "<proc>" "<meta>" "<meta>")
 
+(defun ref (x)
+  (fun v
+    (if (nil? v)
+      x
+      (set! x (car v)))))
+;! > (def _x (ref 123))
+;! ()
+;! > (_x)
+;! 123
+;! > (_x 456)
+;! ()
+;! > (_x)
+;! 456
+
 (defbuiltin open (filepath mode))
 (defbuiltin close (port))
 
@@ -732,18 +746,18 @@
 (defbuiltin read-line (port))
 
 (defun read-all (port)
-  (reify
+  (result-reify
     (let loop ([buf ""])
-      (let ([str-read (reflect (read-str 4096 port))])
+      (let ([str-read (result-reflect (read-str 4096 port))])
         (if (= 'eof str-read)
           buf
           (loop (str-concat buf str-read)))))))
 
 (defun open-read (filepath)
-  (reify
-    (let ([port (reflect (open filepath "r"))]
-          [r (reflect (read-all port))])
-      (reflect (close port))
+  (result-reify
+    (let ([port (result-reflect (open filepath "r"))]
+          [r (result-reflect (read-all port))])
+      (result-reflect (close port))
       r)))
 
 (defun get-byte () (force-success (read-byte stdin)))
@@ -755,9 +769,9 @@
 (defbuiltin write-line (str port))
 
 (defun write-all (str port)
-  (reify
+  (result-reify
     (let loop ([buf str])
-      (let ([bytesize-wrote (reflect (write-str buf port))]
+      (let ([bytesize-wrote (result-reflect (write-str buf port))]
             [bytesize-rest (- (str-bytesize buf) bytesize-wrote)])
         (if (= 0 bytesize-rest)
           ()
@@ -767,10 +781,10 @@
   (write-line "" port))
 
 (defun open-write (filepath str)
-  (reify
-    (let ([port (reflect (open filepath "w"))]
-          [r (reflect (write-all str port))])
-      (reflect (close port))
+  (result-reify
+    (let ([port (result-reflect (open filepath "w"))]
+          [r (result-reflect (write-all str port))])
+      (result-reflect (close port))
       r)))
 
 (defun put-byte (byte) (force-success (write-byte byte stdout)))
@@ -790,3 +804,4 @@
 (defun p xs
   (apply println (map inspect xs)))
 
+(def args ((builtin args)))

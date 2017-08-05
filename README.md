@@ -81,5 +81,7 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 (write-byte byte port)
 (write-str str port)
 (write-line str port)
+
+(args)
 ```
 
