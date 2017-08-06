@@ -62,4 +62,4 @@
     (p-choice (p-some p) p-nil)))
 
 (defun p-reduce (f . args)
-  (p-map (fun (ls) (apply f ls)) (apply p-seq args)))
+  (p-map (partial apply f) (apply p-seq args)))

@@ -1,16 +1,5 @@
 ; Predicates
 
-(defun char-in (s)
-  (let1 chars (str->list s)
-    (fun (x) (list-contains x chars))))
-;! > (map (char-in "abc") (str->list "ace"))
-;! (#t #t #f)
-
-(defun char-not-in (s)
-  (compose not (char-in s)))
-;! > (map (char-not-in "abc") (str->list "ace"))
-;! (#f #f #t)
-
 (defun char-class (s)
   (let ([inverse? (= (str-ref s 0) 94)]
         [ls (str->list s)]
@@ -88,19 +77,19 @@
 (defun ps-if (f)
   (p-where f ps-any))
 ; p-where
-;! > (ps-test (ps-if (char-in "ab")) "abc")
+;! > (ps-test (ps-if (char-class "ab")) "abc")
 ;! (97 . "bc")
-;! > (ps-test (ps-if (char-in "ab")) "def")
+;! > (ps-test (ps-if (char-class "ab")) "def")
 ;! #f
 
 (defun ps-char-if (f)
   (p-map str (ps-if f)))
-;! > (ps-test (ps-char-if (char-in "ab")) "abc")
+;! > (ps-test (ps-char-if (char-class "ab")) "abc")
 ;! ("a" . "bc")
 
 ; p-or, p-choice
-;! > (let ([ab (ps-char-if (char-in "ab"))]
-;! >       [ac (ps-char-if (char-in "ac"))]
+;! > (let ([ab (ps-char-if (char-class "ab"))]
+;! >       [ac (ps-char-if (char-class "ac"))]
 ;! >       [add-suffix (fun (s) (str-concat s "-"))]
 ;! >       [p (p-choice ab (p-map add-suffix ac))])
 ;! >   (list (ps-test p "abcd")
@@ -110,9 +99,9 @@
 ;! (("a" . "bcd") ("b" . "cda") ("c-" . "dab") #f)
 
 ; p-cons, p-nil, p-seq
-;! > (let1 p (p-seq (ps-char-if (char-in "ab"))
-;! >                (ps-char-if (char-in "12"))
-;! >                (ps-char-if (char-in "xy")))
+;! > (let1 p (p-seq (ps-char-if (char-class "ab"))
+;! >                (ps-char-if (char-class "12"))
+;! >                (ps-char-if (char-class "xy")))
 ;! >   (list (ps-test p "c2xo")
 ;! >         (ps-test p "a3yp")
 ;! >         (ps-test p "b1zq")

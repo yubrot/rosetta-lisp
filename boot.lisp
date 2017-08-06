@@ -223,6 +223,20 @@
 ;! > (map not (list 123 () #t #f))
 ;! (#f #f #f #t)
 
+(defun partial (f . args-1)
+  (fun args-2
+    (apply f (append args-1 args-2))))
+;! > ((partial +))
+;! 0
+;! > ((partial -) 1)
+;! -1
+;! > ((partial - 3) 1)
+;! 2
+;! > ((partial - 3 2) 1)
+;! 0
+;! > ((partial - 5 1) 2 3)
+;! -1
+
 (def else #t)
 
 (defmacro cond preds
@@ -570,13 +584,6 @@
 ;! > (list-find num? (list "foo" 'bar "baz"))
 ;! ()
 
-(defun list-contains (x ys)
-  (any (fun (y) (= x y)) ys))
-;! > (list-contains 123 (list 12 34 56))
-;! #f
-;! > (list-contains 123 (list 456 123))
-;! #t
-
 (defun list-lookup (k ls)
   (cond
     [(nil? ls) ()]
@@ -590,6 +597,8 @@
 (def list-ref (flip nth))
 ;! > (list-ref (list 4 3 2) 0)
 ;! 4
+
+(def list-at nth)
 
 (defbuiltin str bytes)
 ;! > (str 102)
@@ -607,6 +616,8 @@
 ;! > (str-ref "foobar" 8)
 ;! ()
 
+(def str-at (flip str-ref))
+
 (defbuiltin str-bytesize (str))
 ;! > (str-bytesize "foobar")
 ;! 6
@@ -616,7 +627,7 @@
 ;! 9
 
 (defun str->list (str)
-  (map (fun (n) (str-ref str n)) (iota 0 (str-bytesize str))))
+  (map (partial str-ref str) (iota 0 (str-bytesize str))))
 ;! > (str->list "foobar")
 ;! (102 111 111 98 97 114)
 
@@ -680,6 +691,32 @@
 ;! "\\t\\t\\n"
 ;! > (str-escape "peo\\ple")
 ;! "peo\\\\ple"
+
+(defun str-unescape (str)
+  (list->str (*bytes-unescape (str->list str))))
+
+(defun *bytes-unescape (bytes)
+  (cond
+    [(or (nil? bytes) (nil? (cdr bytes))) bytes]
+    [(= (car bytes) 92)
+      (let ([l (cadr bytes)]
+            [r (*bytes-unescape (cddr bytes))])
+        (cond
+          [(= l  92) (cons 92 r)] ; \\
+          [(= l 116) (cons  9 r)] ; \t
+          [(= l 110) (cons 10 r)] ; \n
+          [(= l 34)  (cons 34 r)] ; \"
+          [else (cons l r)]))]
+    [else (cons (car bytes) (*bytes-unescape (cdr bytes)))]))
+
+;! > (str-unescape "foo")
+;! "foo"
+;! > (str-unescape "foo\\\"bar")
+;! "foo\"bar"
+;! > (str-unescape "\\t\\t\\n")
+;! "\t\t\n"
+;! > (str-unescape "peo\\\\ple")
+;! "peo\\ple"
 
 (defun inspect (x)
   (cond
