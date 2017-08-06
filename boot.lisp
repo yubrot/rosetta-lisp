@@ -553,6 +553,23 @@
 ;! > (list-count (list 1 3 4 5 6))
 ;! 5
 
+(defun list-find (f ls)
+  (cond
+    [(nil? ls) ()]
+    [(f (car ls)) (car ls)]
+    [else (list-find f (cdr ls))]))
+;! > (list-find num? (list "foo" 'bar 123 "baz" 456))
+;! 123
+;! > (list-find num? (list "foo" 'bar "baz"))
+;! ()
+
+(defun list-contains (x ys)
+  (any (fun (y) (= x y)) ys))
+;! > (list-contains 123 (list 12 34 56))
+;! #f
+;! > (list-contains 123 (list 456 123))
+;! #t
+
 (defun list-lookup (k ls)
   (cond
     [(nil? ls) ()]
