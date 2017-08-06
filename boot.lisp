@@ -46,6 +46,13 @@
 ;! > ((flip (fun (a b) a)) 12 34)
 ;! 34
 
+(defun const (v)
+  (fun _ v))
+;! > ((const 123))
+;! 123
+;! > ((const 123) 456 789)
+;! 123
+
 (def caar (compose car car))
 (def cadr (compose car cdr))
 (def cdar (compose cdr car))

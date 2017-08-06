@@ -31,13 +31,19 @@ def main()
     [:input, :raw] => interpret["EVAL"]
   }
 
-  build "boot.lisp", {
+  lisp_patterns = {
     test_input: /^;! ?> ?(.*)$/,
     test_result: /^;! ?(.*)$/
-  }, {
-    [:raw] => -> raw { "EVAL_ALL #{raw.lines.count}\n#{raw}" },
+  }
+  lisp_handlers = {
+    [:raw] => -> raw { raw.chomp!; "EVAL_ALL #{raw.lines.count}\n#{raw}".chomp },
     [:test_input, :test_result] => interpret["EVAL"]
   }
+
+  build "boot.lisp", lisp_patterns, lisp_handlers
+  build "contrib/stream.lisp", lisp_patterns, lisp_handlers
+  build "contrib/parser-combinators.lisp", lisp_patterns, lisp_handlers
+  build "contrib/parser-combinators-stream.lisp", lisp_patterns, lisp_handlers
 
   open("test", "w") {|f| f.write @buf }
 end
