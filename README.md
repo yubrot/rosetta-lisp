@@ -54,10 +54,6 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 
 (call/cc fun)
 
-(eval s)
-(macroexpand s)
-(macroexpand-1 s)
-
 (str bytes...)
 (str-ref str n)
 (str-bytesize str)
@@ -91,5 +87,9 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 (write-line str port)
 
 (args)
+
+(eval s)
+(macroexpand s)
+(macroexpand-1 s)
 ```
 

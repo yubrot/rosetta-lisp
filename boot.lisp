@@ -224,20 +224,6 @@
 ;! > (map not (list 123 () #t #f))
 ;! (#f #f #f #t)
 
-(defun partial (f . args-1)
-  (fun args-2
-    (apply f (append args-1 args-2))))
-;! > ((partial +))
-;! 0
-;! > ((partial -) 1)
-;! -1
-;! > ((partial - 3) 1)
-;! 2
-;! > ((partial - 3 2) 1)
-;! 0
-;! > ((partial - 5 1) 2 3)
-;! -1
-
 (def else #t)
 
 (defmacro cond preds
@@ -355,6 +341,20 @@
 ;! #t
 ;! > (any num? (list "1" "2" "3"))
 ;! #f
+
+(defun partial (f . args-1)
+  (fun args-2
+    (apply f (append args-1 args-2))))
+;! > ((partial +))
+;! 0
+;! > ((partial -) 1)
+;! -1
+;! > ((partial - 3) 1)
+;! 2
+;! > ((partial - 3 2) 1)
+;! 0
+;! > ((partial - 5 1) 2 3)
+;! -1
 
 (defmacro quasiquote ls
   (*qq 0 (car ls)))
@@ -512,31 +512,6 @@
 ;! > (force-success (success 123))
 ;! 123
 ;! > (force-success (failure "error"))
-;! fail
-
-(defbuiltin eval (s))
-;! > (force-success (eval '(+ 1 2 3)))
-;! 6
-;! > (force-success (eval '(error)))
-;! fail
-
-(defbuiltin macroexpand (s))
-(defbuiltin macroexpand-1 (s))
-;! > (force-success (macroexpand 123))
-;! 123
-;! > (force-success (macroexpand '(defun foo (x y) (+ x y))))
-;! (def foo (fun (x y) (+ x y)))
-;! > (def _skip (macro (a . b) b))
-;! ()
-;! > (force-success (macroexpand '(_skip 12 _skip 34 list 56 78)))
-;! (list 56 78)
-;! > (force-success (macroexpand-1 '(_skip 12 _skip 34 list 56 78)))
-;! (_skip 34 list 56 78)
-;! > (force-success (macroexpand '(list 12 (_skip 34 list 56 78))))
-;! (list 12 (list 56 78))
-;! > (force-success (macroexpand-1 '(list 12 (_skip 34 list 56 78))))
-;! (list 12 (_skip 34 list 56 78))
-;! > (force-success (macroexpand '(_skip)))
 ;! fail
 
 (def result-unit success)
@@ -913,3 +888,28 @@
   (apply println (map inspect xs)))
 
 (def args ((builtin args)))
+
+(defbuiltin eval (s))
+;! > (force-success (eval '(+ 1 2 3)))
+;! 6
+;! > (force-success (eval '(error)))
+;! fail
+
+(defbuiltin macroexpand (s))
+(defbuiltin macroexpand-1 (s))
+;! > (force-success (macroexpand 123))
+;! 123
+;! > (force-success (macroexpand '(defun foo (x y) (+ x y))))
+;! (def foo (fun (x y) (+ x y)))
+;! > (def _skip (macro (a . b) b))
+;! ()
+;! > (force-success (macroexpand '(_skip 12 _skip 34 list 56 78)))
+;! (list 56 78)
+;! > (force-success (macroexpand-1 '(_skip 12 _skip 34 list 56 78)))
+;! (_skip 34 list 56 78)
+;! > (force-success (macroexpand '(list 12 (_skip 34 list 56 78))))
+;! (list 12 (list 56 78))
+;! > (force-success (macroexpand-1 '(list 12 (_skip 34 list 56 78))))
+;! (list 12 (_skip 34 list 56 78))
+;! > (force-success (macroexpand '(_skip)))
+;! fail
