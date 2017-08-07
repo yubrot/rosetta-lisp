@@ -1,24 +1,26 @@
-; (ref (cons <0> (ref (cons <1> (ref (cons <2> (ref ...)))))))
+; <stream> = (vec 'stream <cursor> forward)
+; <cursor> = () | (cons item <stream>)
 (defun stream (input)
-  (def head (ref ()))
+  (def stream-head (vec 'stream () ()))
   (defun forward ()
-    (let1 next-head (ref ())
-      (head (cons (input) next-head))
-      (set! head next-head)))
-  (cons head forward))
+    (let1 next-stream-head (vec 'stream () forward)
+      (vec-set! stream-head 1 (cons (input) next-stream-head))
+      (set! stream-head next-stream-head)))
+  (vec-set! stream-head 2 forward)
+  stream-head)
+
+(defun stream? (v)
+  (and (vec? v)
+       (= (vec-ref v 0) 'stream)))
 
 (defun stream-peek (s)
-  (let ([p (car s)]
-        [forward (cdr s)])
-    (when (nil? (p)) (forward))
-    (car (p))))
+  (when (nil? (vec-ref s 1)) ((vec-ref s 2)))
+  (car (vec-ref s 1)))
 
 (defun stream-next (s)
   (if (= (stream-peek s) 'eof)
     s
-    (let ([p (car s)]
-          [forward (cdr s)])
-      (cons (cdr (p)) forward))))
+    (cdr (vec-ref s 1))))
 
 (defun stream-get (s)
   (if (stream-eof? s)

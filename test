@@ -770,6 +770,10 @@ EVAL_SUCCESS 1 1
 (list (meta? (fun ())) (meta? cons) (meta? (macro ())) (meta? def))
 (#f #f #t #t)
 boot.lisp:99
+EVAL_SUCCESS 1 1
+(list (port? 123) (vec? 123))
+(#f #f)
+boot.lisp:101
 EVAL_ALL 7
 
 (defun list? (x)
@@ -778,23 +782,23 @@ EVAL_ALL 7
     (if (cons? x)
       (list? (cdr x))
       #f)))
-boot.lisp:106
+boot.lisp:108
 EVAL_SUCCESS 1 1
 (list? ())
 #t
-boot.lisp:108
+boot.lisp:110
 EVAL_SUCCESS 1 1
 (list? '(12 . 34))
 #f
-boot.lisp:110
+boot.lisp:112
 EVAL_SUCCESS 1 1
 (list? '(12 34 . 56))
 #f
-boot.lisp:112
+boot.lisp:114
 EVAL_SUCCESS 1 1
 (list? '(12 34 56))
 #t
-boot.lisp:114
+boot.lisp:116
 EVAL_ALL 6
 
 (defbuiltin + nums)
@@ -802,129 +806,129 @@ EVAL_ALL 6
 (defbuiltin * nums)
 (defbuiltin / (num . nums))
 (defbuiltin % (num . nums))
-boot.lisp:120
+boot.lisp:122
 EVAL_SUCCESS 1 1
 (list (+) (+ 11) (+ 3 4 5))
 (0 11 12)
-boot.lisp:122
+boot.lisp:124
 EVAL_SUCCESS 1 1
 (list (- 5) (- 5 2))
 (-5 3)
-boot.lisp:124
+boot.lisp:126
 EVAL_SUCCESS 1 1
 (list (*) (* 11) (* 3 4 5))
 (1 11 60)
-boot.lisp:126
+boot.lisp:128
 EVAL_SUCCESS 1 1
 (list (/ 2) (/ 20 5 2))
 (0.5 2)
-boot.lisp:128
+boot.lisp:130
 EVAL_SUCCESS 1 1
 (list (% 5) (% 5 3))
 (5 2)
-boot.lisp:130
+boot.lisp:132
 EVAL_ALL 2
 
 (defbuiltin = xs)
-boot.lisp:132
+boot.lisp:134
 EVAL_SUCCESS 1 1
 (list (=) (= 1) (= 1 1) (= 1 2) (= 1 1 1) (= 1 1 2))
 (#t #t #t #f #t #f)
-boot.lisp:134
+boot.lisp:136
 EVAL_SUCCESS 1 1
 (list (= "foo" "foo") (= "foo" "bar"))
 (#t #f)
-boot.lisp:136
+boot.lisp:138
 EVAL_SUCCESS 1 1
 (list (= #t #t) (= #f #f) (= #t #f))
 (#t #t #f)
-boot.lisp:138
+boot.lisp:140
 EVAL_SUCCESS 1 1
 (list (= () ()) (= '(1 2) '(1 2)) (= '(1 2) '(1 3)) (= '(1 2 . 3) '(1 2 . 3)) (= '(1 2 3) '(1 2 . 3)))
 (#t #t #f #t #f)
-boot.lisp:140
+boot.lisp:142
 EVAL_SUCCESS 1 1
 (= (fun ()) (fun ()))
 #f
-boot.lisp:142
+boot.lisp:144
 EVAL_SUCCESS 1 1
 (list (= 123 "123") (= "foo" 'foo))
 (#f #f)
-boot.lisp:144
+boot.lisp:146
 EVAL_ALL 5
 
 (defbuiltin < nums-or-strs)
 (defbuiltin > nums-or-strs)
 (defbuiltin <= nums-or-strs)
 (defbuiltin >= nums-or-strs)
-boot.lisp:149
+boot.lisp:151
 EVAL_SUCCESS 1 1
 (list (<) (< 1) (< 1 2) (< 1 2 3) (< 1 3 3) (< 1 4 3) (< 4 3) (< 4 4 3))
 (#t #t #t #t #f #f #f #f)
-boot.lisp:151
+boot.lisp:153
 EVAL_SUCCESS 1 1
 (list (>) (> 1) (> 1 2) (> 1 2 3) (> 1 3 3) (> 1 4 3) (> 4 3) (> 4 4 3))
 (#t #t #f #f #f #f #t #f)
-boot.lisp:153
+boot.lisp:155
 EVAL_SUCCESS 1 1
 (list (<=) (<= 1) (<= 1 2) (<= 1 2 3) (<= 1 3 3) (<= 1 4 3) (<= 4 3) (<= 4 4 3))
 (#t #t #t #t #t #f #f #f)
-boot.lisp:155
+boot.lisp:157
 EVAL_SUCCESS 1 1
 (list (>=) (>= 1) (>= 1 2) (>= 1 2 3) (>= 1 3 3) (>= 1 4 3) (>= 4 3) (>= 4 4 3))
 (#t #t #f #f #f #f #t #t)
-boot.lisp:157
+boot.lisp:159
 EVAL_SUCCESS 1 1
 (list (< "abc" "cab") (< "abc" "abd") (< "bac" "acb"))
 (#t #t #f)
-boot.lisp:159
-EVAL_FAILURE 1
-(< 123 "456")
 boot.lisp:161
 EVAL_FAILURE 1
-(< #f)
+(< 123 "456")
 boot.lisp:163
+EVAL_FAILURE 1
+(< #f)
+boot.lisp:165
 EVAL_ALL 5
 
 (defun map (f xs)
   (if (nil? xs)
     ()
     (cons (f (car xs)) (map f (cdr xs)))))
-boot.lisp:168
+boot.lisp:170
 EVAL_SUCCESS 1 1
 (map (fun (a) (* a 3)) (list 1 2 5 4))
 (3 6 15 12)
-boot.lisp:170
+boot.lisp:172
 EVAL_ALL 2
 
 (def for (flip map))
-boot.lisp:172
+boot.lisp:174
 EVAL_SUCCESS 1 1
 (for (list 1 2 3) (fun (a) (* a a)))
 (1 4 9)
-boot.lisp:174
+boot.lisp:176
 EVAL_ALL 5
 
 (defun foldl (f i xs)
   (if (nil? xs)
     i
     (foldl f (f i (car xs)) (cdr xs))))
-boot.lisp:179
+boot.lisp:181
 EVAL_SUCCESS 1 1
 (foldl cons () (list 2 5 3))
 (((() . 2) . 5) . 3)
-boot.lisp:181
+boot.lisp:183
 EVAL_ALL 5
 
 (defun foldr (f i xs)
   (if (nil? xs)
     i
     (f (car xs) (foldr f i (cdr xs)))))
-boot.lisp:186
+boot.lisp:188
 EVAL_SUCCESS 1 1
 (foldr cons () (list 2 5 3))
 (2 5 3)
-boot.lisp:188
+boot.lisp:190
 EVAL_ALL 8
 
 (defun append ls
@@ -934,85 +938,59 @@ EVAL_ALL 8
   (if (nil? a)
     b
     (cons (car a) (*append (cdr a) b))))
-boot.lisp:196
+boot.lisp:198
 EVAL_SUCCESS 1 1
 (append (list 1 2 3) (list 4 5 6) (list 7 8))
 (1 2 3 4 5 6 7 8)
-boot.lisp:198
+boot.lisp:200
 EVAL_ALL 3
 
 (defun reverse (ls)
   (foldl (flip cons) () ls))
-boot.lisp:201
+boot.lisp:203
 EVAL_SUCCESS 1 1
 (reverse (list 1 2 4 5))
 (5 4 2 1)
-boot.lisp:203
+boot.lisp:205
 EVAL_ALL 5
 
 (defun nth (n xs)
   (if (= n 0)
     (car xs)
     (nth (- n 1) (cdr xs))))
-boot.lisp:208
+boot.lisp:210
 EVAL_SUCCESS 1 1
 (nth 3 (list 9 8 7 6 5))
 6
-boot.lisp:210
+boot.lisp:212
 EVAL_ALL 5
 
 (defun iota (a b)
   (if (< a b)
     (cons a (iota (+ a 1) b))
     '()))
-boot.lisp:215
+boot.lisp:217
 EVAL_SUCCESS 1 1
 (iota 0 5)
 (0 1 2 3 4)
-boot.lisp:217
+boot.lisp:219
 EVAL_SUCCESS 1 1
 (iota 2 4)
 (2 3)
-boot.lisp:219
+boot.lisp:221
 EVAL_SUCCESS 1 1
 (iota 3 3)
 ()
-boot.lisp:221
+boot.lisp:223
 EVAL_ALL 3
 
 (defun not (x)
   (if x #f #t))
-boot.lisp:224
+boot.lisp:226
 EVAL_SUCCESS 1 1
 (map not (list 123 () #t #f))
 (#f #f #f #t)
-boot.lisp:226
-EVAL_ALL 4
-
-(defun partial (f . args-1)
-  (fun args-2
-    (apply f (append args-1 args-2))))
-boot.lisp:230
-EVAL_SUCCESS 1 1
-((partial +))
-0
-boot.lisp:232
-EVAL_SUCCESS 1 1
-((partial -) 1)
--1
-boot.lisp:234
-EVAL_SUCCESS 1 1
-((partial - 3) 1)
-2
-boot.lisp:236
-EVAL_SUCCESS 1 1
-((partial - 3 2) 1)
-0
-boot.lisp:238
-EVAL_SUCCESS 1 1
-((partial - 5 1) 2 3)
--1
-boot.lisp:240
+boot.lisp:228
 EVAL_ALL 9
 
 (def else #t)
@@ -1023,50 +1001,50 @@ EVAL_ALL 9
     (list 'if (caar preds)
           (cons 'begin (cdar preds))
           (cons 'cond (cdr preds)))))
-boot.lisp:249
+boot.lisp:237
 EVAL_SUCCESS 1 1
 (cond)
 ()
-boot.lisp:251
+boot.lisp:239
 EVAL_SUCCESS 1 1
 (cond [#t 123])
 123
-boot.lisp:253
+boot.lisp:241
 EVAL_SUCCESS 1 1
 (cond [#t 123 456])
 456
-boot.lisp:255
+boot.lisp:243
 EVAL_SUCCESS 1 1
 (cond [#t 1] [#t 2] [#t 3])
 1
-boot.lisp:257
+boot.lisp:245
 EVAL_SUCCESS 1 1
 (cond [#f 1] [#t 2] [#t 3])
 2
-boot.lisp:259
+boot.lisp:247
 EVAL_SUCCESS 1 1
 (cond [#f 1] [#f 2] [#t 3])
 3
-boot.lisp:261
+boot.lisp:249
 EVAL_SUCCESS 1 1
 (cond [#f 1] [#f 2] [#f 3])
 ()
-boot.lisp:263
+boot.lisp:251
 EVAL_SUCCESS 1 1
 (def _r ())
 ()
-boot.lisp:265
+boot.lisp:253
 EVAL_SUCCESS 4 1
 (cond
   [(begin (set! _r (cons 1 _r)) #f) (set! _r (cons 2 _r))]
   [(begin (set! _r (cons 3 _r)) #t) (set! _r (cons 4 _r))]
   [(begin (set! _r (cons 5 _r)) #t) (set! _r (cons 6 _r))])
 ()
-boot.lisp:270
+boot.lisp:258
 EVAL_SUCCESS 1 1
 _r
 (4 3 1)
-boot.lisp:272
+boot.lisp:260
 EVAL_ALL 10
 
 (defmacro and values
@@ -1078,31 +1056,31 @@ EVAL_ALL 10
                          (list 'if tmp (cons 'and (cdr values)) tmp))
                    (car values)))
            (gensym))]))
-boot.lisp:282
+boot.lisp:270
 EVAL_SUCCESS 1 1
 (and)
 #t
-boot.lisp:284
+boot.lisp:272
 EVAL_SUCCESS 1 1
 (and 123)
 123
-boot.lisp:286
+boot.lisp:274
 EVAL_SUCCESS 1 1
 (and 123 456)
 456
-boot.lisp:288
+boot.lisp:276
 EVAL_SUCCESS 1 1
 (and #f 456)
 #f
-boot.lisp:290
+boot.lisp:278
 EVAL_SUCCESS 1 1
 (and 123 456 789)
 789
-boot.lisp:292
+boot.lisp:280
 EVAL_SUCCESS 1 1
 (def _r ())
 ()
-boot.lisp:294
+boot.lisp:282
 EVAL_SUCCESS 5 1
 (and
   (begin (set! _r (cons 1 _r)) 123)
@@ -1110,11 +1088,11 @@ EVAL_SUCCESS 5 1
   (begin (set! _r (cons 3 _r)) #f)
   (begin (set! _r (cons 4 _r)) 789))
 #f
-boot.lisp:300
+boot.lisp:288
 EVAL_SUCCESS 1 1
 _r
 (3 2 1)
-boot.lisp:302
+boot.lisp:290
 EVAL_ALL 10
 
 (defmacro or values
@@ -1126,31 +1104,31 @@ EVAL_ALL 10
                          (list 'if tmp tmp (cons 'or (cdr values))))
                    (car values)))
            (gensym))]))
-boot.lisp:312
+boot.lisp:300
 EVAL_SUCCESS 1 1
 (or)
 #f
-boot.lisp:314
+boot.lisp:302
 EVAL_SUCCESS 1 1
 (or 123)
 123
-boot.lisp:316
+boot.lisp:304
 EVAL_SUCCESS 1 1
 (or 123 456)
 123
-boot.lisp:318
+boot.lisp:306
 EVAL_SUCCESS 1 1
 (or #f 456)
 456
-boot.lisp:320
+boot.lisp:308
 EVAL_SUCCESS 1 1
 (or 123 456 789)
 123
-boot.lisp:322
+boot.lisp:310
 EVAL_SUCCESS 1 1
 (def _r ())
 ()
-boot.lisp:324
+boot.lisp:312
 EVAL_SUCCESS 5 1
 (or
   (begin (set! _r (cons 1 _r)) #f)
@@ -1158,11 +1136,11 @@ EVAL_SUCCESS 5 1
   (begin (set! _r (cons 3 _r)) 123)
   (begin (set! _r (cons 4 _r)) 456))
 123
-boot.lisp:330
+boot.lisp:318
 EVAL_SUCCESS 1 1
 _r
 (3 2 1)
-boot.lisp:332
+boot.lisp:320
 EVAL_ALL 6
 
 (defun all (f xs)
@@ -1170,19 +1148,19 @@ EVAL_ALL 6
     #t
     (and (f (car xs))
          (all f (cdr xs)))))
-boot.lisp:338
+boot.lisp:326
 EVAL_SUCCESS 1 1
 (all num? (list))
 #t
-boot.lisp:340
+boot.lisp:328
 EVAL_SUCCESS 1 1
 (all num? (list 1 2 3))
 #t
-boot.lisp:342
+boot.lisp:330
 EVAL_SUCCESS 1 1
 (all num? (list 1 "2" 3))
 #f
-boot.lisp:344
+boot.lisp:332
 EVAL_ALL 6
 
 (defun any (f xs)
@@ -1190,23 +1168,49 @@ EVAL_ALL 6
     #f
     (or (f (car xs))
         (any f (cdr xs)))))
-boot.lisp:350
+boot.lisp:338
 EVAL_SUCCESS 1 1
 (any num? (list))
 #f
-boot.lisp:352
+boot.lisp:340
 EVAL_SUCCESS 1 1
 (any num? (list 1 2 3))
 #t
-boot.lisp:354
+boot.lisp:342
 EVAL_SUCCESS 1 1
 (any num? (list "1" 2 "3"))
 #t
-boot.lisp:356
+boot.lisp:344
 EVAL_SUCCESS 1 1
 (any num? (list "1" "2" "3"))
 #f
+boot.lisp:346
+EVAL_ALL 4
+
+(defun partial (f . args-1)
+  (fun args-2
+    (apply f (append args-1 args-2))))
+boot.lisp:350
+EVAL_SUCCESS 1 1
+((partial +))
+0
+boot.lisp:352
+EVAL_SUCCESS 1 1
+((partial -) 1)
+-1
+boot.lisp:354
+EVAL_SUCCESS 1 1
+((partial - 3) 1)
+2
+boot.lisp:356
+EVAL_SUCCESS 1 1
+((partial - 3 2) 1)
+0
 boot.lisp:358
+EVAL_SUCCESS 1 1
+((partial - 5 1) 2 3)
+-1
+boot.lisp:360
 EVAL_ALL 51
 
 (defmacro quasiquote ls
@@ -1259,87 +1263,87 @@ EVAL_ALL 51
     (let ([args (map car binds)])
       `(let ,binds (letrec ([,sym (fun ,args ,@body)]) (,sym ,@args))))
     (error "Syntax error: expected (named-let name ((name expr)...) body...)")))
-boot.lisp:410
+boot.lisp:412
 EVAL_SUCCESS 1 1
 (let ([_x 2] [_y 3]) (* _x _y))
 6
-boot.lisp:412
+boot.lisp:414
 EVAL_FAILURE 1
 _x
-boot.lisp:414
+boot.lisp:416
 EVAL_SUCCESS 4 1
 (let _loop ([x 10] [sum 0])
   (if (< 0 x)
     (_loop (- x 1) (+ sum x))
     sum))
 55
-boot.lisp:419
+boot.lisp:421
 EVAL_FAILURE 1
 _loop
-boot.lisp:421
+boot.lisp:423
 EVAL_SUCCESS 1 1
 (let ([x 3] [x (* x 4)] [x (+ x 5)]) x)
 17
-boot.lisp:423
+boot.lisp:425
 EVAL_SUCCESS 3 1
 (letrec ([even? (fun (x) (if (= (% x 2) 0) #t (odd? (- x 1))))]
          [odd? (fun (x) (if (= (% x 2) 0) #f (even? (- x 1))))])
   (list (even? 4) (even? 5) (odd? 6) (odd? 7)))
 (#t #f #f #t)
-boot.lisp:427
+boot.lisp:429
 EVAL_ALL 3
 
 (defmacro when (cond . body)
   `(if ,cond (begin ,@body) ()))
-boot.lisp:430
+boot.lisp:432
 EVAL_SUCCESS 1 1
 (when #f 123 456)
 ()
-boot.lisp:432
+boot.lisp:434
 EVAL_SUCCESS 1 1
 (when #t 123 456)
 456
-boot.lisp:434
+boot.lisp:436
 EVAL_ALL 3
 
 (defmacro unless (cond . body)
   `(if ,cond () (begin ,@body)))
-boot.lisp:437
+boot.lisp:439
 EVAL_SUCCESS 1 1
 (unless #f 123 456)
 456
-boot.lisp:439
+boot.lisp:441
 EVAL_SUCCESS 1 1
 (unless #t 123 456)
 ()
-boot.lisp:441
+boot.lisp:443
 EVAL_ALL 3
 
 (defmacro let1 (var expr . body)
   `(let ([,var ,expr]) ,@body))
-boot.lisp:444
+boot.lisp:446
 EVAL_SUCCESS 4 1
 (let1 x 3
   (let1 x (* x 4)
     (let1 x (+ x 5)
       x)))
 17
-boot.lisp:449
+boot.lisp:451
 EVAL_ALL 5
 
 (defbuiltin call/cc (fun))
 
 (defmacro let/cc (k . body)
   `(call/cc (fun (,k) ,@body)))
-boot.lisp:455
+boot.lisp:457
 EVAL_SUCCESS 1 1
 (+ 1 (let/cc cont (+ 10 (cont 100))))
 101
-boot.lisp:457
+boot.lisp:459
 EVAL_SUCCESS 1 1
 (+ 1 (let/cc cont (+ 10 100)))
 111
-boot.lisp:459
+boot.lisp:461
 EVAL_SUCCESS 7 1
 (let ([x 10] [sum 0] [cont #f])
   (let/cc k (set! cont k))
@@ -1349,7 +1353,7 @@ EVAL_SUCCESS 7 1
     (cont))
   sum)
 55
-boot.lisp:467
+boot.lisp:469
 EVAL_ALL 26
 
 (defmacro shift (k . body)
@@ -1377,7 +1381,7 @@ EVAL_ALL 26
     (*abort (fun ()
               (f (fun vs
                    (reset (apply k vs))))))))
-boot.lisp:494
+boot.lisp:496
 EVAL_SUCCESS 5 1
 (reset
   (shift k (append '(1) (k)))
@@ -1385,7 +1389,7 @@ EVAL_SUCCESS 5 1
   (shift k (append '(3) (k)))
   '())
 (1 2 3)
-boot.lisp:500
+boot.lisp:502
 EVAL_ALL 11
 
 (defun success (v) (cons #t v))
@@ -1398,61 +1402,14 @@ EVAL_ALL 11
   (if (success? v)
     (cdr v)
     (error (cdr v))))
-boot.lisp:512
+boot.lisp:514
 EVAL_SUCCESS 1 1
 (force-success (success 123))
 123
-boot.lisp:514
+boot.lisp:516
 EVAL_FAILURE 1
 (force-success (failure "error"))
-boot.lisp:516
-EVAL_ALL 2
-
-(defbuiltin eval (s))
 boot.lisp:518
-EVAL_SUCCESS 1 1
-(force-success (eval '(+ 1 2 3)))
-6
-boot.lisp:520
-EVAL_FAILURE 1
-(force-success (eval '(error)))
-boot.lisp:522
-EVAL_ALL 3
-
-(defbuiltin macroexpand (s))
-(defbuiltin macroexpand-1 (s))
-boot.lisp:525
-EVAL_SUCCESS 1 1
-(force-success (macroexpand 123))
-123
-boot.lisp:527
-EVAL_SUCCESS 1 1
-(force-success (macroexpand '(defun foo (x y) (+ x y))))
-(def foo (fun (x y) (+ x y)))
-boot.lisp:529
-EVAL_SUCCESS 1 1
-(def _skip (macro (a . b) b))
-()
-boot.lisp:531
-EVAL_SUCCESS 1 1
-(force-success (macroexpand '(_skip 12 _skip 34 list 56 78)))
-(list 56 78)
-boot.lisp:533
-EVAL_SUCCESS 1 1
-(force-success (macroexpand-1 '(_skip 12 _skip 34 list 56 78)))
-(_skip 34 list 56 78)
-boot.lisp:535
-EVAL_SUCCESS 1 1
-(force-success (macroexpand '(list 12 (_skip 34 list 56 78))))
-(list 12 (list 56 78))
-boot.lisp:537
-EVAL_SUCCESS 1 1
-(force-success (macroexpand-1 '(list 12 (_skip 34 list 56 78))))
-(list 12 (_skip 34 list 56 78))
-boot.lisp:539
-EVAL_FAILURE 1
-(force-success (macroexpand '(_skip)))
-boot.lisp:541
 EVAL_ALL 11
 
 (def result-unit success)
@@ -1465,35 +1422,35 @@ EVAL_ALL 11
 
 (defun result-reflect (m)
   (shift k (result-bind m k)))
-boot.lisp:553
+boot.lisp:530
 EVAL_SUCCESS 1 1
 (result-reify 123)
 (#t . 123)
-boot.lisp:555
+boot.lisp:532
 EVAL_SUCCESS 1 1
 (result-reify (+ (result-reflect (success 123)) 456))
 (#t . 579)
-boot.lisp:557
+boot.lisp:534
 EVAL_SUCCESS 1 1
 (result-reify (+ (result-reflect (failure "error")) 456))
 (#f . "error")
-boot.lisp:559
+boot.lisp:536
 EVAL_SUCCESS 1 1
 (result-reify (let1 a (result-reify 123) (+ (result-reflect a) 1)))
 (#t . 124)
-boot.lisp:561
+boot.lisp:538
 EVAL_SUCCESS 1 1
 (result-reify (let1 a (result-reify (result-reflect (success 123))) (+ (result-reflect a) 1)))
 (#t . 124)
-boot.lisp:563
+boot.lisp:540
 EVAL_SUCCESS 1 1
 (result-reify (let1 a (result-reify (result-reflect (failure "error"))) (+ (result-reflect a) 1)))
 (#f . "error")
-boot.lisp:565
+boot.lisp:542
 EVAL_SUCCESS 1 1
 (result-reify (let1 a (result-reify (result-reflect (failure "error"))) a))
 (#t #f . "error")
-boot.lisp:567
+boot.lisp:544
 EVAL_ALL 8
 
 (def list-concat append)
@@ -1503,11 +1460,11 @@ EVAL_ALL 8
     (if (nil? xs)
       c
       (loop (cdr xs) (+ c 1)))))
-boot.lisp:575
+boot.lisp:552
 EVAL_SUCCESS 1 1
 (list-count (list 1 3 4 5 6))
 5
-boot.lisp:577
+boot.lisp:554
 EVAL_ALL 6
 
 (defun list-find (f ls)
@@ -1515,15 +1472,15 @@ EVAL_ALL 6
     [(nil? ls) ()]
     [(f (car ls)) (car ls)]
     [else (list-find f (cdr ls))]))
-boot.lisp:583
+boot.lisp:560
 EVAL_SUCCESS 1 1
 (list-find num? (list "foo" 'bar 123 "baz" 456))
 123
-boot.lisp:585
+boot.lisp:562
 EVAL_SUCCESS 1 1
 (list-find num? (list "foo" 'bar "baz"))
 ()
-boot.lisp:587
+boot.lisp:564
 EVAL_ALL 6
 
 (defun list-lookup (k ls)
@@ -1531,154 +1488,154 @@ EVAL_ALL 6
     [(nil? ls) ()]
     [(= (caar ls) k) (cdar ls)]
     [else (list-lookup k (cdr ls))]))
-boot.lisp:593
+boot.lisp:570
 EVAL_SUCCESS 1 1
 (list-lookup 2 '((1 . "foo") (2 . "bar") (3 . "baz")))
 "bar"
-boot.lisp:595
+boot.lisp:572
 EVAL_SUCCESS 1 1
 (list-lookup 5 '((1 . "foo") (2 . "bar") (3 . "baz")))
 ()
-boot.lisp:597
+boot.lisp:574
 EVAL_ALL 2
 
 (def list-ref (flip nth))
-boot.lisp:599
+boot.lisp:576
 EVAL_SUCCESS 1 1
 (list-ref (list 4 3 2) 0)
 4
-boot.lisp:601
+boot.lisp:578
 EVAL_ALL 4
 
 (def list-at nth)
 
 (defbuiltin str bytes)
-boot.lisp:605
+boot.lisp:582
 EVAL_SUCCESS 1 1
 (str 102)
 "f"
-boot.lisp:607
+boot.lisp:584
 EVAL_SUCCESS 1 1
 (str 102 111 111 98 97 114)
 "foobar"
-boot.lisp:609
+boot.lisp:586
 EVAL_FAILURE 1
 (str 260)
-boot.lisp:611
+boot.lisp:588
 EVAL_ALL 2
 
 (defbuiltin str-ref (str n))
-boot.lisp:613
+boot.lisp:590
 EVAL_SUCCESS 1 1
 (str-ref "foobar" 0)
 102
-boot.lisp:615
+boot.lisp:592
 EVAL_SUCCESS 1 1
 (str-ref "foobar" 1)
 111
-boot.lisp:617
+boot.lisp:594
 EVAL_SUCCESS 1 1
 (str-ref "foobar" 8)
 ()
-boot.lisp:619
+boot.lisp:596
 EVAL_ALL 4
 
 (def str-at (flip str-ref))
 
 (defbuiltin str-bytesize (str))
-boot.lisp:623
+boot.lisp:600
 EVAL_SUCCESS 1 1
 (str-bytesize "foobar")
 6
-boot.lisp:625
+boot.lisp:602
 EVAL_FAILURE 1
 (str-bytesize "foobar" "baz")
-boot.lisp:627
+boot.lisp:604
 EVAL_SUCCESS 1 1
 (str-bytesize "日本語")
 9
-boot.lisp:629
+boot.lisp:606
 EVAL_ALL 3
 
 (defun str->list (str)
   (map (partial str-ref str) (iota 0 (str-bytesize str))))
-boot.lisp:632
+boot.lisp:609
 EVAL_SUCCESS 1 1
 (str->list "foobar")
 (102 111 111 98 97 114)
-boot.lisp:634
+boot.lisp:611
 EVAL_ALL 3
 
 (defun list->str (list)
   (apply str list))
-boot.lisp:637
+boot.lisp:614
 EVAL_SUCCESS 1 1
 (list->str (list 102 111 111 98 97 114))
 "foobar"
-boot.lisp:639
+boot.lisp:616
 EVAL_ALL 2
 
 (defbuiltin str-concat strs)
-boot.lisp:641
+boot.lisp:618
 EVAL_SUCCESS 1 1
 (str-concat)
 ""
-boot.lisp:643
+boot.lisp:620
 EVAL_SUCCESS 1 1
 (str-concat "foo" "bar" "baz")
 "foobarbaz"
-boot.lisp:645
+boot.lisp:622
 EVAL_ALL 2
 
 (defbuiltin substr (str n bytesize))
-boot.lisp:647
+boot.lisp:624
 EVAL_SUCCESS 1 1
 (substr "foobar" 0 3)
 "foo"
-boot.lisp:649
+boot.lisp:626
 EVAL_SUCCESS 1 1
 (substr "foobar" 2 3)
 "oba"
-boot.lisp:651
+boot.lisp:628
 EVAL_SUCCESS 1 1
 (substr "foobar" 1 4)
 "ooba"
-boot.lisp:653
+boot.lisp:630
 EVAL_SUCCESS 1 1
 (str->list (substr "日本語" 0 3))
 (230 151 165)
-boot.lisp:655
+boot.lisp:632
 EVAL_FAILURE 1
 (substr "foobar" 1 10)
-boot.lisp:657
+boot.lisp:634
 EVAL_ALL 2
 
 (defbuiltin sym->str (sym))
-boot.lisp:659
+boot.lisp:636
 EVAL_SUCCESS 1 1
 (sym->str 'foo-bar)
 "foo-bar"
-boot.lisp:661
+boot.lisp:638
 EVAL_ALL 2
 
 (defbuiltin num->str (num))
-boot.lisp:663
+boot.lisp:640
 EVAL_SUCCESS 1 1
 (num->str 123)
 "123"
-boot.lisp:665
+boot.lisp:642
 EVAL_ALL 2
 
 (defbuiltin str->num (num))
-boot.lisp:667
+boot.lisp:644
 EVAL_SUCCESS 1 1
 (str->num "456")
 456
-boot.lisp:669
+boot.lisp:646
 EVAL_SUCCESS 1 1
 (str->num "foo")
 ()
-boot.lisp:671
+boot.lisp:648
 EVAL_ALL 15
 
 (defun str-escape (str)
@@ -1695,23 +1652,23 @@ EVAL_ALL 15
         [(= l 10) (append '(92 110) r)] ; \n
         [(= l 34) (append '(92  34) r)] ; \"
         [else (cons l r)]))))
-boot.lisp:687
+boot.lisp:664
 EVAL_SUCCESS 1 1
 (str-escape "foo")
 "foo"
-boot.lisp:689
+boot.lisp:666
 EVAL_SUCCESS 1 1
 (str-escape "foo\"bar")
 "foo\\\"bar"
-boot.lisp:691
+boot.lisp:668
 EVAL_SUCCESS 1 1
 (str-escape "\t\t\n")
 "\\t\\t\\n"
-boot.lisp:693
+boot.lisp:670
 EVAL_SUCCESS 1 1
 (str-escape "peo\\ple")
 "peo\\\\ple"
-boot.lisp:695
+boot.lisp:672
 EVAL_ALL 17
 
 (defun str-unescape (str)
@@ -1730,76 +1687,80 @@ EVAL_ALL 17
           [(= l 34)  (cons 34 r)] ; \"
           [else (cons l r)]))]
     [else (cons (car bytes) (*bytes-unescape (cdr bytes)))]))
-boot.lisp:713
+boot.lisp:690
 EVAL_SUCCESS 1 1
 (str-unescape "foo")
 "foo"
-boot.lisp:715
+boot.lisp:692
 EVAL_SUCCESS 1 1
 (str-unescape "foo\\\"bar")
 "foo\"bar"
-boot.lisp:717
+boot.lisp:694
 EVAL_SUCCESS 1 1
 (str-unescape "\\t\\t\\n")
 "\t\t\n"
-boot.lisp:719
+boot.lisp:696
 EVAL_SUCCESS 1 1
 (str-unescape "peo\\\\ple")
 "peo\\ple"
-boot.lisp:721
+boot.lisp:698
 EVAL_ALL 2
 
 (defbuiltin vec items)
-boot.lisp:723
+boot.lisp:700
 EVAL_SUCCESS 1 1
 (vec 1 2 3)
 (vec 1 2 3)
-boot.lisp:725
+boot.lisp:702
+EVAL_SUCCESS 1 1
+(vec? (vec 1 2 3))
+#t
+boot.lisp:704
 EVAL_ALL 2
 
 (defbuiltin vec-make (length init))
-boot.lisp:727
+boot.lisp:706
 EVAL_SUCCESS 1 1
 (vec-make 5 #f)
 (vec #f #f #f #f #f)
-boot.lisp:729
+boot.lisp:708
 EVAL_ALL 2
 
 (defbuiltin vec-ref (vec n))
-boot.lisp:731
+boot.lisp:710
 EVAL_SUCCESS 1 1
 (vec-ref (vec 4 9 3) 1)
 9
-boot.lisp:733
+boot.lisp:712
 EVAL_ALL 4
 
 (def vec-at (flip vec-ref))
 
 (defbuiltin vec-length (vec))
-boot.lisp:737
+boot.lisp:716
 EVAL_SUCCESS 1 1
 (vec-length (vec))
 0
-boot.lisp:739
+boot.lisp:718
 EVAL_SUCCESS 1 1
 (vec-length (vec 1 2 3 4 5))
 5
-boot.lisp:741
+boot.lisp:720
 EVAL_ALL 2
 
 (defbuiltin vec-set! (vec n item))
-boot.lisp:743
+boot.lisp:722
 EVAL_SUCCESS 4 1
 (let1 v (vec-make 3 #f)
   (vec-set! v 0 #t)
   (vec-set! v 2 "k")
   v)
 (vec #t #f "k")
-boot.lisp:748
+boot.lisp:727
 EVAL_ALL 2
 
 (defbuiltin vec-copy! (dest dest-start src src-start length))
-boot.lisp:750
+boot.lisp:729
 EVAL_SUCCESS 5 1
 (let ([fs (vec-make 5 #f)]
       [ts (vec-make 3 #t)])
@@ -1807,140 +1768,26 @@ EVAL_SUCCESS 5 1
   (vec-copy! fs 1 ts 0 2)
   fs)
 (vec #f #t "k" #f #f)
-boot.lisp:756
+boot.lisp:735
 EVAL_ALL 3
 
 (defun vec->list (vec)
   (map (partial vec-ref vec) (iota 0 (vec-length vec))))
-boot.lisp:759
+boot.lisp:738
 EVAL_SUCCESS 1 1
 (vec->list (vec 1 3 5 7))
 (1 3 5 7)
-boot.lisp:761
+boot.lisp:740
 EVAL_ALL 3
 
 (defun list->vec (list)
   (apply vec list))
-boot.lisp:764
+boot.lisp:743
 EVAL_SUCCESS 1 1
 (list->vec (list 1 3 5 7))
 (vec 1 3 5 7)
-boot.lisp:766
-EVAL_ALL 32
-
-(defun inspect (x)
-  (cond
-    [(num? x) (num->str x)]
-    [(sym? x) (sym->str x)]
-    [(str? x) (str-concat "\"" (str-escape x) "\"")]
-    [(cons? x) (let ([l (car x)]
-                     [r (cdr x)]
-                     [a (list-lookup l *syntax-sugar)])
-                 (if (and (not (nil? a)) (cons? r) (nil? (cdr r)))
-                   (str-concat a (inspect (car r)))
-                   (str-concat "(" (*inspect-cons l r) ")")))]
-    [(nil? x) "()"]
-    [(= #t x) "#t"]
-    [(= #f x) "#f"]
-    [(proc? x) "<proc>"]
-    [(meta? x) "<meta>"]
-    [(port? x) "<port>"]
-    [(vec? x) (inspect (cons 'vec (vec->list x)))]
-    [else (error)]))
-
-(def *syntax-sugar
-  '((quote . "'")
-    (quasiquote . "`")
-    (unquote . ",")
-    (unquote-splicing . ",@")))
-
-(defun *inspect-cons (a b)
-  (cond
-    [(nil? b) (inspect a)]
-    [(cons? b) (str-concat (inspect a) " " (*inspect-cons (car b) (cdr b)))]
-    [else (str-concat (inspect a) " . " (inspect b))]))
-boot.lisp:799
-EVAL_SUCCESS 1 1
-(inspect 123)
-"123"
-boot.lisp:801
-EVAL_SUCCESS 1 1
-(inspect 'foo)
-"foo"
-boot.lisp:803
-EVAL_SUCCESS 1 1
-(inspect "Hello, World!\n")
-"\"Hello, World!\\n\""
-boot.lisp:805
-EVAL_SUCCESS 1 1
-(inspect ())
-"()"
-boot.lisp:807
-EVAL_SUCCESS 1 1
-(inspect '(1))
-"(1)"
-boot.lisp:809
-EVAL_SUCCESS 1 1
-(inspect '(1 a "b"))
-"(1 a \"b\")"
-boot.lisp:811
-EVAL_SUCCESS 1 1
-(inspect '(foo . bar))
-"(foo . bar)"
-boot.lisp:813
-EVAL_SUCCESS 1 1
-(inspect '(foo bar . baz))
-"(foo bar . baz)"
-boot.lisp:815
-EVAL_SUCCESS 1 1
-(map inspect (list ''foo ''(bar baz)))
-("'foo" "'(bar baz)")
-boot.lisp:817
-EVAL_SUCCESS 1 1
-(inspect '`(foo ,bar ,@baz))
-"`(foo ,bar ,@baz)"
-boot.lisp:819
-EVAL_SUCCESS 1 1
-(inspect '(quote foo bar))
-"(quote foo bar)"
-boot.lisp:821
-EVAL_SUCCESS 1 1
-(inspect '(quote . foo))
-"(quote . foo)"
-boot.lisp:823
-EVAL_SUCCESS 1 1
-(map inspect '(#t #f))
-("#t" "#f")
-boot.lisp:825
-EVAL_SUCCESS 1 1
-(map inspect (list (fun ()) = (macro ()) def))
-("<proc>" "<proc>" "<meta>" "<meta>")
-boot.lisp:827
-EVAL_ALL 6
-
-(defun ref (x)
-  (fun v
-    (if (nil? v)
-      x
-      (set! x (car v)))))
-boot.lisp:833
-EVAL_SUCCESS 1 1
-(def _x (ref 123))
-()
-boot.lisp:835
-EVAL_SUCCESS 1 1
-(_x)
-123
-boot.lisp:837
-EVAL_SUCCESS 1 1
-(_x 456)
-()
-boot.lisp:839
-EVAL_SUCCESS 1 1
-(_x)
-456
-boot.lisp:841
-EVAL_ALL 7
+boot.lisp:745
+EVAL_ALL 90
 
 (defbuiltin open (filepath mode))
 (defbuiltin close (port))
@@ -1948,12 +1795,6 @@ EVAL_ALL 7
 (def stdin ((builtin stdin)))
 (def stdout ((builtin stdout)))
 (def stderr ((builtin stderr)))
-boot.lisp:849
-EVAL_SUCCESS 1 1
-(map inspect (list stdin stdout stderr))
-("<port>" "<port>" "<port>")
-boot.lisp:851
-EVAL_ALL 65
 
 (defbuiltin read-byte (port))
 (defbuiltin read-str (size port))
@@ -2006,6 +1847,104 @@ EVAL_ALL 65
 (defun put-all (str) (force-success (write-all str stdout)))
 (defun put-newline () (force-success (write-newline stdout)))
 
+(defun inspect (x)
+  (cond
+    [(num? x) (num->str x)]
+    [(sym? x) (sym->str x)]
+    [(str? x) (str-concat "\"" (str-escape x) "\"")]
+    [(cons? x) (let ([l (car x)]
+                     [r (cdr x)]
+                     [a (list-lookup l *syntax-sugar)])
+                 (if (and (not (nil? a)) (cons? r) (nil? (cdr r)))
+                   (str-concat a (inspect (car r)))
+                   (str-concat "(" (*inspect-cons l r) ")")))]
+    [(nil? x) "()"]
+    [(= #t x) "#t"]
+    [(= #f x) "#f"]
+    [(proc? x) "<proc>"]
+    [(meta? x) "<meta>"]
+    [(port? x) "<port>"]
+    [(vec? x) (inspect (cons 'vec (vec->list x)))]
+    [else (error)]))
+
+(def *syntax-sugar
+  '((quote . "'")
+    (quasiquote . "`")
+    (unquote . ",")
+    (unquote-splicing . ",@")))
+
+(defun *inspect-cons (a b)
+  (cond
+    [(nil? b) (inspect a)]
+    [(cons? b) (str-concat (inspect a) " " (*inspect-cons (car b) (cdr b)))]
+    [else (str-concat (inspect a) " . " (inspect b))]))
+boot.lisp:836
+EVAL_SUCCESS 1 1
+(inspect 123)
+"123"
+boot.lisp:838
+EVAL_SUCCESS 1 1
+(inspect 'foo)
+"foo"
+boot.lisp:840
+EVAL_SUCCESS 1 1
+(inspect "Hello, World!\n")
+"\"Hello, World!\\n\""
+boot.lisp:842
+EVAL_SUCCESS 1 1
+(inspect ())
+"()"
+boot.lisp:844
+EVAL_SUCCESS 1 1
+(inspect '(1))
+"(1)"
+boot.lisp:846
+EVAL_SUCCESS 1 1
+(inspect '(1 a "b"))
+"(1 a \"b\")"
+boot.lisp:848
+EVAL_SUCCESS 1 1
+(inspect '(foo . bar))
+"(foo . bar)"
+boot.lisp:850
+EVAL_SUCCESS 1 1
+(inspect '(foo bar . baz))
+"(foo bar . baz)"
+boot.lisp:852
+EVAL_SUCCESS 1 1
+(map inspect (list ''foo ''(bar baz)))
+("'foo" "'(bar baz)")
+boot.lisp:854
+EVAL_SUCCESS 1 1
+(inspect '`(foo ,bar ,@baz))
+"`(foo ,bar ,@baz)"
+boot.lisp:856
+EVAL_SUCCESS 1 1
+(inspect '(quote foo bar))
+"(quote foo bar)"
+boot.lisp:858
+EVAL_SUCCESS 1 1
+(inspect '(quote . foo))
+"(quote . foo)"
+boot.lisp:860
+EVAL_SUCCESS 1 1
+(map inspect '(#t #f))
+("#t" "#f")
+boot.lisp:862
+EVAL_SUCCESS 1 1
+(map inspect (list (fun ()) = (macro ()) def))
+("<proc>" "<proc>" "<meta>" "<meta>")
+boot.lisp:864
+EVAL_SUCCESS 1 1
+(map inspect (list stdin stdout stderr))
+("<port>" "<port>" "<port>")
+boot.lisp:866
+EVAL_SUCCESS 1 1
+(inspect (vec 1 2 3))
+"(vec 1 2 3)"
+boot.lisp:868
+EVAL_ALL 16
+
 (defun print strs
   (map put-all strs)
   ())
@@ -2019,29 +1958,76 @@ EVAL_ALL 65
   (apply println (map inspect xs)))
 
 (def args ((builtin args)))
+
+(defbuiltin eval (s))
+boot.lisp:884
+EVAL_SUCCESS 1 1
+(force-success (eval '(+ 1 2 3)))
+6
+boot.lisp:886
+EVAL_FAILURE 1
+(force-success (eval '(error)))
+boot.lisp:888
+EVAL_ALL 3
+
+(defbuiltin macroexpand (s))
+(defbuiltin macroexpand-1 (s))
+boot.lisp:891
+EVAL_SUCCESS 1 1
+(force-success (macroexpand 123))
+123
+boot.lisp:893
+EVAL_SUCCESS 1 1
+(force-success (macroexpand '(defun foo (x y) (+ x y))))
+(def foo (fun (x y) (+ x y)))
+boot.lisp:895
+EVAL_SUCCESS 1 1
+(def _skip (macro (a . b) b))
+()
+boot.lisp:897
+EVAL_SUCCESS 1 1
+(force-success (macroexpand '(_skip 12 _skip 34 list 56 78)))
+(list 56 78)
+boot.lisp:899
+EVAL_SUCCESS 1 1
+(force-success (macroexpand-1 '(_skip 12 _skip 34 list 56 78)))
+(_skip 34 list 56 78)
+boot.lisp:901
+EVAL_SUCCESS 1 1
+(force-success (macroexpand '(list 12 (_skip 34 list 56 78))))
+(list 12 (list 56 78))
+boot.lisp:903
+EVAL_SUCCESS 1 1
+(force-success (macroexpand-1 '(list 12 (_skip 34 list 56 78))))
+(list 12 (_skip 34 list 56 78))
+boot.lisp:905
+EVAL_FAILURE 1
+(force-success (macroexpand '(_skip)))
 contrib/stream.lisp:1
-EVAL_ALL 39
-; (ref (cons <0> (ref (cons <1> (ref (cons <2> (ref ...)))))))
+EVAL_ALL 41
+; <stream> = (vec 'stream <cursor> forward)
+; <cursor> = () | (cons item <stream>)
 (defun stream (input)
-  (def head (ref ()))
+  (def stream-head (vec 'stream () ()))
   (defun forward ()
-    (let1 next-head (ref ())
-      (head (cons (input) next-head))
-      (set! head next-head)))
-  (cons head forward))
+    (let1 next-stream-head (vec 'stream () forward)
+      (vec-set! stream-head 1 (cons (input) next-stream-head))
+      (set! stream-head next-stream-head)))
+  (vec-set! stream-head 2 forward)
+  stream-head)
+
+(defun stream? (v)
+  (and (vec? v)
+       (= (vec-ref v 0) 'stream)))
 
 (defun stream-peek (s)
-  (let ([p (car s)]
-        [forward (cdr s)])
-    (when (nil? (p)) (forward))
-    (car (p))))
+  (when (nil? (vec-ref s 1)) ((vec-ref s 2)))
+  (car (vec-ref s 1)))
 
 (defun stream-next (s)
   (if (= (stream-peek s) 'eof)
     s
-    (let ([p (car s)]
-          [forward (cdr s)])
-      (cons (cdr (p)) forward))))
+    (cdr (vec-ref s 1))))
 
 (defun stream-get (s)
   (if (stream-eof? s)
@@ -2060,51 +2046,51 @@ EVAL_ALL 39
 
 (defun stream-eof? (s)
   (= (stream-peek s) 'eof))
-contrib/stream.lisp:41
+contrib/stream.lisp:43
 EVAL_SUCCESS 1 1
 (def _x 0)
 ()
-contrib/stream.lisp:43
+contrib/stream.lisp:45
 EVAL_SUCCESS 1 1
 (def _s1 (stream (fun () (set! _x (+ _x 1)) _x)))
 ()
-contrib/stream.lisp:45
-EVAL_SUCCESS 1 1
-(stream-peek _s1)
-1
 contrib/stream.lisp:47
 EVAL_SUCCESS 1 1
 (stream-peek _s1)
 1
 contrib/stream.lisp:49
 EVAL_SUCCESS 1 1
+(stream-peek _s1)
+1
+contrib/stream.lisp:51
+EVAL_SUCCESS 1 1
 (def _s2 (stream-next _s1))
 ()
-contrib/stream.lisp:51
+contrib/stream.lisp:53
 EVAL_SUCCESS 1 1
 (cons (stream-peek _s1) (stream-peek _s2))
 (1 . 2)
-contrib/stream.lisp:53
+contrib/stream.lisp:55
 EVAL_SUCCESS 1 1
 (set! _s1 (stream-next (stream-next _s1)))
 ()
-contrib/stream.lisp:55
+contrib/stream.lisp:57
 EVAL_SUCCESS 1 1
 (cons (stream-peek _s1) (stream-peek _s2))
 (3 . 2)
-contrib/stream.lisp:57
+contrib/stream.lisp:59
 EVAL_SUCCESS 1 1
 (set! _s1 (force-success (stream-get _s1)))
 ()
-contrib/stream.lisp:59
+contrib/stream.lisp:61
 EVAL_SUCCESS 1 1
 (cons (car _s1) (stream-peek (cdr _s1)))
 (3 . 4)
-contrib/stream.lisp:61
+contrib/stream.lisp:63
 EVAL_SUCCESS 1 1
 (force-success (stream-take 4 _s2))
 (2 3 4 5)
-contrib/stream.lisp:63
+contrib/stream.lisp:65
 EVAL_ALL 9
 
 (defun list->stream (ls)
@@ -2115,22 +2101,22 @@ EVAL_ALL 9
         (let1 r (car ls)
           (set! ls (cdr ls))
           r)))))
-contrib/stream.lisp:72
+contrib/stream.lisp:74
 EVAL_SUCCESS 1 1
 (force-success (stream-take 4 (list->stream (list 1 2 3 4 5))))
 (1 2 3 4)
-contrib/stream.lisp:74
+contrib/stream.lisp:76
 EVAL_ALL 5
 
 (defun stream->list (s)
   (if (stream-eof? s)
     ()
     (cons (stream-peek s) (stream->list (stream-next s)))))
-contrib/stream.lisp:79
+contrib/stream.lisp:81
 EVAL_SUCCESS 1 1
 (stream->list (list->stream (list 1 2 3)))
 (1 2 3)
-contrib/stream.lisp:81
+contrib/stream.lisp:83
 EVAL_ALL 10
 
 (defun str->stream (str)
@@ -2142,23 +2128,23 @@ EVAL_ALL 10
             (set! i (+ i 1))
             r)
           'eof)))))
-contrib/stream.lisp:91
+contrib/stream.lisp:93
 EVAL_SUCCESS 1 1
 (force-success (stream-take 3 (str->stream "abc")))
 (97 98 99)
-contrib/stream.lisp:93
+contrib/stream.lisp:95
 EVAL_FAILURE 1
 (force-success (stream-take 4 (str->stream "abc")))
-contrib/stream.lisp:95
+contrib/stream.lisp:97
 EVAL_ALL 3
 
 (defun stream->str (s)
   (apply str (stream->list s)))
-contrib/stream.lisp:98
+contrib/stream.lisp:100
 EVAL_SUCCESS 1 1
 (stream->str (list->stream (list 97 98 99)))
 "abc"
-contrib/stream.lisp:100
+contrib/stream.lisp:102
 EVAL_ALL 5
 
 (defun port->stream (port)

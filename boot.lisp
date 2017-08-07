@@ -96,6 +96,8 @@
 ;! (#t #t #f #f)
 ;! > (list (meta? (fun ())) (meta? cons) (meta? (macro ())) (meta? def))
 ;! (#f #f #t #t)
+;! > (list (port? 123) (vec? 123))
+;! (#f #f)
 
 (defun list? (x)
   (if (nil? x)
@@ -697,6 +699,8 @@
 (defbuiltin vec items)
 ;! > (vec 1 2 3)
 ;! (vec 1 2 3)
+;! > (vec? (vec 1 2 3))
+;! #t
 
 (defbuiltin vec-make (length init))
 ;! > (vec-make 5 #f)
@@ -738,6 +742,64 @@
   (apply vec list))
 ;! > (list->vec (list 1 3 5 7))
 ;! (vec 1 3 5 7)
+
+(defbuiltin open (filepath mode))
+(defbuiltin close (port))
+
+(def stdin ((builtin stdin)))
+(def stdout ((builtin stdout)))
+(def stderr ((builtin stderr)))
+
+(defbuiltin read-byte (port))
+(defbuiltin read-str (size port))
+(defbuiltin read-line (port))
+
+(defun read-all (port)
+  (result-reify
+    (let loop ([buf ""])
+      (let ([str-read (result-reflect (read-str 4096 port))])
+        (if (= 'eof str-read)
+          buf
+          (loop (str-concat buf str-read)))))))
+
+(defun open-read (filepath)
+  (result-reify
+    (let ([port (result-reflect (open filepath "r"))]
+          [r (result-reflect (read-all port))])
+      (result-reflect (close port))
+      r)))
+
+(defun get-byte () (force-success (read-byte stdin)))
+(defun get-line () (force-success (read-line stdin)))
+(defun get-all () (force-success (read-all stdin)))
+
+(defbuiltin write-byte (byte port))
+(defbuiltin write-str (str port))
+(defbuiltin write-line (str port))
+
+(defun write-all (str port)
+  (result-reify
+    (let loop ([buf str])
+      (let ([bytesize-wrote (result-reflect (write-str buf port))]
+            [bytesize-rest (- (str-bytesize buf) bytesize-wrote)])
+        (if (= 0 bytesize-rest)
+          ()
+          (loop (substr buf bytesize-wrote bytesize-rest)))))))
+
+(defun write-newline (port)
+  (write-line "" port))
+
+(defun open-write (filepath str)
+  (result-reify
+    (let ([port (result-reflect (open filepath "w"))]
+          [r (result-reflect (write-all str port))])
+      (result-reflect (close port))
+      r)))
+
+(defun put-byte (byte) (force-success (write-byte byte stdout)))
+(defun put-line (str) (force-success (write-line str stdout)))
+(defun put-all (str) (force-success (write-all str stdout)))
+(defun put-newline () (force-success (write-newline stdout)))
 
 (defun inspect (x)
   (cond
@@ -799,81 +861,10 @@
 ;! ("#t" "#f")
 ;! > (map inspect (list (fun ()) = (macro ()) def))
 ;! ("<proc>" "<proc>" "<meta>" "<meta>")
-
-(defun ref (x)
-  (fun v
-    (if (nil? v)
-      x
-      (set! x (car v)))))
-;! > (def _x (ref 123))
-;! ()
-;! > (_x)
-;! 123
-;! > (_x 456)
-;! ()
-;! > (_x)
-;! 456
-
-(defbuiltin open (filepath mode))
-(defbuiltin close (port))
-
-(def stdin ((builtin stdin)))
-(def stdout ((builtin stdout)))
-(def stderr ((builtin stderr)))
-
 ;! > (map inspect (list stdin stdout stderr))
 ;! ("<port>" "<port>" "<port>")
-
-(defbuiltin read-byte (port))
-(defbuiltin read-str (size port))
-(defbuiltin read-line (port))
-
-(defun read-all (port)
-  (result-reify
-    (let loop ([buf ""])
-      (let ([str-read (result-reflect (read-str 4096 port))])
-        (if (= 'eof str-read)
-          buf
-          (loop (str-concat buf str-read)))))))
-
-(defun open-read (filepath)
-  (result-reify
-    (let ([port (result-reflect (open filepath "r"))]
-          [r (result-reflect (read-all port))])
-      (result-reflect (close port))
-      r)))
-
-(defun get-byte () (force-success (read-byte stdin)))
-(defun get-line () (force-success (read-line stdin)))
-(defun get-all () (force-success (read-all stdin)))
-
-(defbuiltin write-byte (byte port))
-(defbuiltin write-str (str port))
-(defbuiltin write-line (str port))
-
-(defun write-all (str port)
-  (result-reify
-    (let loop ([buf str])
-      (let ([bytesize-wrote (result-reflect (write-str buf port))]
-            [bytesize-rest (- (str-bytesize buf) bytesize-wrote)])
-        (if (= 0 bytesize-rest)
-          ()
-          (loop (substr buf bytesize-wrote bytesize-rest)))))))
-
-(defun write-newline (port)
-  (write-line "" port))
-
-(defun open-write (filepath str)
-  (result-reify
-    (let ([port (result-reflect (open filepath "w"))]
-          [r (result-reflect (write-all str port))])
-      (result-reflect (close port))
-      r)))
-
-(defun put-byte (byte) (force-success (write-byte byte stdout)))
-(defun put-line (str) (force-success (write-line str stdout)))
-(defun put-all (str) (force-success (write-all str stdout)))
-(defun put-newline () (force-success (write-newline stdout)))
+;! > (inspect (vec 1 2 3))
+;! "(vec 1 2 3)"
 
 (defun print strs
   (map put-all strs)
