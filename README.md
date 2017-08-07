@@ -38,6 +38,7 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 (proc? x)
 (meta? x)
 (port? x)
+(vec? x)
 
 (+ nums...)
 (- num nums...)
@@ -66,6 +67,13 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 (num->str num)
 (str->num str)
 
+(vec items...)
+(vec-make length init)
+(vec-ref vec n)
+(vec-length vec)
+(vec-set! vec n item)
+(vec-copy! dest dest-start src src-start length)
+
 (open filepath mode) ; mode = "r" | "w"
 (close port)
 
@@ -74,7 +82,7 @@ lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocal
 (stderr)
 
 (read-byte port)
-(read-str size port)
+(read-str bytesize port)
 (read-line port)
 ; Returns 'eof instead of data read on EOF
 

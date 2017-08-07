@@ -75,6 +75,7 @@
 (defbuiltin proc? (x))
 (defbuiltin meta? (x))
 (defbuiltin port? (x))
+(defbuiltin vec? (x))
 ;! > (num? 123)
 ;! #t
 ;! > (num? 12 34)
@@ -718,6 +719,51 @@
 ;! > (str-unescape "peo\\\\ple")
 ;! "peo\\ple"
 
+(defbuiltin vec items)
+;! > (vec 1 2 3)
+;! (vec 1 2 3)
+
+(defbuiltin vec-make (length init))
+;! > (vec-make 5 #f)
+;! (vec #f #f #f #f #f)
+
+(defbuiltin vec-ref (vec n))
+;! > (vec-ref (vec 4 9 3) 1)
+;! 9
+
+(def vec-at (flip vec-ref))
+
+(defbuiltin vec-length (vec))
+;! > (vec-length (vec))
+;! 0
+;! > (vec-length (vec 1 2 3 4 5))
+;! 5
+
+(defbuiltin vec-set! (vec n item))
+;! > (let1 v (vec-make 3 #f)
+;! >   (vec-set! v 0 #t)
+;! >   (vec-set! v 2 "k")
+;! >   v)
+;! (vec #t #f "k")
+
+(defbuiltin vec-copy! (dest dest-start src src-start length))
+;! > (let ([fs (vec-make 5 #f)]
+;! >       [ts (vec-make 3 #t)])
+;! >   (vec-set! ts 1 "k")
+;! >   (vec-copy! fs 1 ts 0 2)
+;! >   fs)
+;! (vec #f #t "k" #f #f)
+
+(defun vec->list (vec)
+  (map (partial vec-ref vec) (iota 0 (vec-length vec))))
+;! > (vec->list (vec 1 3 5 7))
+;! (1 3 5 7)
+
+(defun list->vec (list)
+  (apply vec list))
+;! > (list->vec (list 1 3 5 7))
+;! (vec 1 3 5 7)
+
 (defun inspect (x)
   (cond
     [(num? x) (num->str x)]
@@ -735,6 +781,7 @@
     [(proc? x) "<proc>"]
     [(meta? x) "<meta>"]
     [(port? x) "<port>"]
+    [(vec? x) (inspect (cons 'vec (vec->list x)))]
     [else (error)]))
 
 (def *syntax-sugar
