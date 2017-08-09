@@ -44,6 +44,7 @@ def main()
   build "contrib/stream.lisp", lisp_patterns, lisp_handlers
   build "contrib/parser-combinators.lisp", lisp_patterns, lisp_handlers
   build "contrib/parser-combinators-stream.lisp", lisp_patterns, lisp_handlers
+  build "contrib/tbl.lisp", lisp_patterns, lisp_handlers
 
   open("test", "w") {|f| f.write @buf }
 end

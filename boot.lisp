@@ -170,6 +170,15 @@
 ;! > (map (fun (a) (* a 3)) (list 1 2 5 4))
 ;! (3 6 15 12)
 
+(defun filter (f xs)
+  (if (nil? xs)
+    ()
+    (if (f (car xs))
+      (cons (car xs) (filter f (cdr xs)))
+      (filter f (cdr xs)))))
+;! > (filter num? (list 1 2 "foo" 3 'bar 4))
+;! (1 2 3 4)
+
 (def for (flip map))
 ;! > (for (list 1 2 3) (fun (a) (* a a)))
 ;! (1 4 9)
