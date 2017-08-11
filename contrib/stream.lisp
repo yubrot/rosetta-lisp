@@ -1,26 +1,25 @@
-; <stream> = (vec 'stream <cursor> forward)
-; <cursor> = () | (cons item <stream>)
-(defun stream (input)
-  (def stream-head (vec 'stream () ()))
-  (defun forward ()
-    (let1 next-stream-head (vec 'stream () forward)
-      (vec-set! stream-head 1 (cons (input) next-stream-head))
-      (set! stream-head next-stream-head)))
-  (vec-set! stream-head 2 forward)
-  stream-head)
+(defrecord stream *stream stream?
+  ([body *stream-body *stream-set-body!] ; () | (cons item next-stream)
+   [forward *stream-forward]))
 
-(defun stream? (v)
-  (and (vec? v)
-       (= (vec-ref v 0) 'stream)))
+(defun stream (input)
+  (letrec ([stream-head ()]
+           [forward
+             (fun ()
+               (let1 next-stream-head (*stream () forward)
+                 (*stream-set-body! stream-head (cons (input) next-stream-head))
+                 (set! stream-head next-stream-head)))])
+    (set! stream-head (*stream () forward))
+    stream-head))
 
 (defun stream-peek (s)
-  (when (nil? (vec-ref s 1)) ((vec-ref s 2)))
-  (car (vec-ref s 1)))
+  (when (nil? (*stream-body s)) ((*stream-forward s)))
+  (car (*stream-body s)))
 
 (defun stream-next (s)
   (if (= (stream-peek s) 'eof)
     s
-    (cdr (vec-ref s 1))))
+    (cdr (*stream-body s))))
 
 (defun stream-get (s)
   (if (stream-eof? s)

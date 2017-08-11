@@ -36,6 +36,13 @@
 ;! > (apply cons (list 12 34))
 ;! (12 . 34)
 
+(defun id (a)
+  a)
+;! > (id 0)
+;! 0
+;! > (id "foo")
+;! "foo"
+
 (defun compose (f g)
   (fun (x) (f (g x))))
 ;! > ((compose car cdr) (list 12 34 56))
@@ -581,6 +588,20 @@
 ;! > (list-lookup 5 '((1 . "foo") (2 . "bar") (3 . "baz")))
 ;! ()
 
+(defun list-zip-with (f xs ys)
+  (if (or (nil? xs) (nil? ys))
+    ()
+    (cons (f (car xs) (car ys))
+          (list-zip-with f (cdr xs) (cdr ys)))))
+
+(defun list-zip (xs ys)
+  (list-zip-with cons xs ys))
+
+;! > (list-zip '(1 2 3) '(a b c))
+;! ((1 . a) (2 . b) (3 . c))
+;! > (list-zip '(1 2 3) '(x y))
+;! ((1 . x) (2 . y))
+
 (def list-ref (flip nth))
 ;! > (list-ref (list 4 3 2) 0)
 ;! 4
@@ -751,6 +772,44 @@
   (apply vec list))
 ;! > (list->vec (list 1 3 5 7))
 ;! (vec 1 3 5 7)
+
+(defmacro defrecord (name constructor-name predicate-name fields)
+  (unless (and (sym? name)
+               (or (sym? constructor-name) (= #f constructor-name))
+               (or (sym? predicate-name) (= #f predicate-name))
+               (list? fields)
+               (all list? fields)
+               (all (compose not nil?) fields)
+               (all (partial all sym?) fields))
+    (error "Syntax error: expected (defrecord name predicate-name (fields...))"))
+  (let ([field-names (map car fields)]
+        [field-getter-names (map (fun (field) (and (cons? (cdr field)) (cadr field))) fields)]
+        [field-setter-names (map (fun (field) (and (cons? (cdr field)) (cons? (cddr field)) (caddr field))) fields)]
+        [field-indices (iota 1 (+ 1 (list-count fields)))]
+        [constructor (and constructor-name `(defun ,constructor-name ,field-names (vec ',name ,@field-names)))]
+        [predicate (and predicate-name `(defun ,predicate-name (v) (and (vec? v) (= ',name (vec-ref v 0)))))]
+        [getters (list-zip-with (fun (i f) (and f `(defun ,f (v) (vec-ref v ,i)))) field-indices field-getter-names)]
+        [setters (list-zip-with (fun (i f) (and f `(defun ,f (v x) (vec-set! v ,i x)))) field-indices field-setter-names)])
+    `(begin
+       ,constructor
+       ,predicate
+       ,@(filter id getters)
+       ,@(filter id setters))))
+
+;! > (defrecord point point point?
+;! >   ([x point-x]
+;! >    [y point-y set-point-y!]))
+;! ()
+;! > (def _p (point 12 34))
+;! ()
+;! > (list (point? _p) (point? 123))
+;! (#t #f)
+;! > (list (point-x _p) (point-y _p))
+;! (12 34)
+;! > (set-point-y! _p 56)
+;! ()
+;! > (list (point-x _p) (point-y _p))
+;! (12 56)
 
 (defbuiltin open (filepath mode))
 (defbuiltin close (port))

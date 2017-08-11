@@ -24,30 +24,25 @@
         (* i (*tbl-g hash M)))
      M))
 
-; <tbl> = (vec 'tbl capacity-stream length removed <payload>)
+(defrecord tbl *tbl tbl?
+  ([capacity *tbl-capacity *tbl-set-capacity!]
+   [length-total *tbl-length-total *tbl-set-length-total!]
+   [length-removed *tbl-length-removed *tbl-set-length-removed!]
+   [payload *tbl-payload *tbl-set-payload!]))
+
 ; <payload> = (vec <item> ...)
 ; <item> = (key . value) | key | #f
 
 (defun tbl ()
-  (let1 t (vec-make 5 ())
-    (vec-set! t 0 'tbl)
+  (let1 t (*tbl () () () ())
     (tbl-clear! t)
     t))
 
 (defun tbl-clear! (t)
-  (vec-set! t 1 *tbl-capacity-provider)
-  (vec-set! t 2 0)
-  (vec-set! t 3 0)
-  (vec-set! t 4 (vec-make (stream-peek *tbl-capacity-provider) #f)))
-
-(defun tbl? (x)
-  (and (vec? x)
-       (= (vec-ref x 0) 'tbl)))
-
-(defun *tbl-capacity (tbl) (vec-ref tbl 1))
-(defun *tbl-length-total (tbl) (vec-ref tbl 2))
-(defun *tbl-length-removed (tbl) (vec-ref tbl 3))
-(defun *tbl-payload (tbl) (vec-ref tbl 4))
+  (*tbl-set-capacity! t *tbl-capacity-provider)
+  (*tbl-set-length-total! t 0)
+  (*tbl-set-length-removed! t 0)
+  (*tbl-set-payload! t (vec-make (stream-peek *tbl-capacity-provider) #f)))
 
 (defun tbl-justify! (tbl additional-capacity)
   (let ([payload-required-length (+ (*tbl-length-total tbl) additional-capacity)]
@@ -58,10 +53,10 @@
       (let ([payload (*tbl-payload tbl)]
             [new-capacity (*tbl-forward-capacity (*tbl-capacity tbl) required-length)]
             [new-payload (vec-make (stream-peek new-capacity) #f)])
-        (vec-set! tbl 1 new-capacity)
-        (vec-set! tbl 2 0)
-        (vec-set! tbl 3 0)
-        (vec-set! tbl 4 new-payload)
+        (*tbl-set-capacity! tbl new-capacity)
+        (*tbl-set-length-total! tbl 0)
+        (*tbl-set-length-removed! tbl 0)
+        (*tbl-set-payload! tbl new-payload)
         (*tbl-migrate! payload tbl)))))
 
 (defun *tbl-forward-capacity (s length)
@@ -107,15 +102,15 @@
         [prev (vec-ref (*tbl-payload tbl) index)])
     (vec-set! (*tbl-payload tbl) index (cons key value))
     (cond
-      [(not prev) (vec-set! tbl 2 (+ (*tbl-length-total tbl) 1))]
-      [(str? prev) (vec-set! tbl 3 (- (*tbl-length-removed tbl) 1))])))
+      [(not prev) (*tbl-set-length-total! tbl (+ (*tbl-length-total tbl) 1))]
+      [(str? prev) (*tbl-set-length-removed! tbl (- (*tbl-length-removed tbl) 1))])))
 
 (defun tbl-remove! (tbl key)
   (let ([index (*tbl-find-index tbl key)]
         [prev (vec-ref (*tbl-payload tbl) index)])
     (when (cons? prev)
       (vec-set! (*tbl-payload tbl) index key)
-      (vec-set! tbl 3 (+ (*tbl-length-removed tbl) 1)))))
+      (*tbl-set-length-removed! tbl (+ (*tbl-length-removed tbl) 1)))))
 
 ;! > (tbl? (tbl))
 ;! #t
