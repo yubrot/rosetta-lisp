@@ -519,23 +519,34 @@
 (defun success (v) (cons #t v))
 (defun failure (v) (cons #f v))
 
+(defun result (v) (cdr v))
+
 (defun success? (v) (car v))
 (defun failure? (v) (not (car v)))
 
 (defun force-success (v)
   (if (success? v)
-    (cdr v)
-    (error (cdr v))))
+    (result v)
+    (error (result v))))
+
+(defun force-failure (v)
+  (if (failure? v)
+    (result v)
+    (error "force-failure")))
 
 ;! > (force-success (success 123))
 ;! 123
 ;! > (force-success (failure "error"))
 ;! fail
+;! > (force-failure (success 123))
+;! fail
+;! > (force-failure (failure "error"))
+;! "error"
 
 (def result-unit success)
 
 (defun result-bind (m f)
-  (if (success? m) (f (cdr m)) m))
+  (if (success? m) (f (result m)) m))
 
 (defmacro result-reify body
   `(reset (result-unit (begin ,@body))))
@@ -725,6 +736,43 @@
 ;! "\t\t\n"
 ;! > (str-unescape "peo\\\\ple")
 ;! "peo\\ple"
+
+(defun str-trim (s)
+  (str-trim-left (str-trim-right s)))
+
+(defun str-trim-left (s)
+  (let1 i (let loop ([i 0])
+            (if (trim-target? (str-ref s i))
+              (loop (+ i 1))
+              i))
+    (if (= i 0)
+      s
+      (substr s i (- (str-bytesize s) i)))))
+
+(defun str-trim-right (s)
+  (let1 i (let loop ([i (- (str-bytesize s) 1)])
+            (if (trim-target? (str-ref s i))
+              (loop (- i 1))
+              i))
+    (if (= i (- (str-bytesize s) 1))
+      s
+      (substr s 0 (+ i 1)))))
+
+(defun trim-target? (c)
+  (or (= 32 c) (= 10 c) (= 9 c)))
+
+;! > (str-trim-left "foo")
+;! "foo"
+;! > (str-trim-left " foo")
+;! "foo"
+;! > (str-trim-left "   \n foo")
+;! "foo"
+;! > (str-trim-right "foo")
+;! "foo"
+;! > (str-trim-right "foo ")
+;! "foo"
+;! > (str-trim-right "foo   \n ")
+;! "foo"
 
 (defbuiltin vec items)
 ;! > (vec 1 2 3)

@@ -1,8 +1,11 @@
-; input -> (result . input) | #f
+; (input) => (result . input) | #f
 ; tested in parser-combinators-stream
 
 (defun parse (p i)
-  (p i))
+  (let1 r (p i)
+    (if r
+      (success r)
+      (failure "Parse error"))))
 
 (defun p-unit (x)
   (fun (i) (cons x i)))
@@ -20,8 +23,6 @@
 
 (defun p-reflect (m)
   (shift k (p-bind m k)))
-
-;;;;
 
 (defmacro p-lazy (p)
   `(fun (i) (,p i)))

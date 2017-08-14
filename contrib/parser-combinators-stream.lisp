@@ -1,3 +1,13 @@
+(defun parse-just (p stream)
+  (let1 p (p-reduce (fun (x _) x) p ps-eof)
+    (result-reify
+      (car (result-reflect (parse p stream))))))
+
+;! > (defun ps-test (p str)
+;! >   (let1 r (p (str->stream str))
+;! >     (and r (cons (car r) (stream->str (cdr r))))))
+;! ()
+
 ; Predicates
 
 (defun char-class (s)
@@ -28,13 +38,7 @@
 ;! > (map (char-class "^a-fstx-z") (str->list "abcfgtuwy"))
 ;! (#f #f #f #f #t #f #t #t #f)
 
-;;;;
 ; Parser combinators
-
-;! > (defun ps-test (p str)
-;! >   (let1 r (parse p (str->stream str))
-;! >     (and r (cons (car r) (stream->str (cdr r))))))
-;! ()
 
 (defun ps-any (i)
   (and (not (= (stream-peek i) 'eof)) (cons (stream-peek i) (stream-next i))))
