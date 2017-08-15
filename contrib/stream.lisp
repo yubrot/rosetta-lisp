@@ -29,12 +29,17 @@
       (success (cons r s)))))
 
 (defun stream-take (n s)
-  (result-reify
-    (let loop ([n n] [s s])
-      (if (= n 0)
-        ()
-        (let1 r (result-reflect (stream-get s))
-          (cons (car r) (loop (- n 1) (cdr r))))))))
+  (let loop ([n n]
+             [s s]
+             [ret ()])
+    (if (= n 0)
+      (success (reverse ret))
+      (let1 r (stream-get s)
+        (if (success? r)
+          (loop (- n 1)
+                (cdr (result r))
+                (cons (car (result r)) ret))
+          r)))))
 
 (defun stream-eof? (s)
   (= (stream-peek s) 'eof))

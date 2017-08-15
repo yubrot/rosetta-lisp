@@ -466,6 +466,7 @@
 ;! 17
 
 (defbuiltin call/cc (fun))
+(defbuiltin never (fun . args))
 
 (defmacro let/cc (k . body)
   `(call/cc (fun (,k) ,@body)))
@@ -492,22 +493,27 @@
 (def *cont #f)
 
 (defun *abort (thunk)
-  (let1 v (thunk)
-    (*cont v)))
+  (never
+    (fun ()
+      (let1 v (thunk)
+        (*cont v)))))
 
 (defun *reset (thunk)
   (let1 cont *cont
     (let/cc k
-      (set! *cont (fun (v)
-                    (set! *cont cont)
-                    (k v)))
+      (set! *cont
+        (fun (v)
+          (set! *cont cont)
+          (k v)))
       (*abort thunk))))
 
 (defun *shift (f)
   (let/cc k
-    (*abort (fun ()
-              (f (fun vs
-                   (reset (apply k vs))))))))
+    (*abort
+      (fun ()
+        (f
+          (fun vs
+            (reset (apply k vs))))))))
 
 ;! > (reset
 ;! >   (shift k (append '(1) (k)))
@@ -871,12 +877,12 @@
 (defbuiltin read-line (port))
 
 (defun read-all (port)
-  (result-reify
-    (let loop ([buf ""])
-      (let ([str-read (result-reflect (read-str 4096 port))])
-        (if (= 'eof str-read)
-          buf
-          (loop (str-concat buf str-read)))))))
+  (let loop ([buf ()])
+    (let1 str-read (read-str 4096 port)
+      (cond
+        [(failure? str-read) str-read]
+        [(= 'eof (result str-read)) (success (apply str-concat (reverse buf)))]
+        [else (loop (cons (result str-read) buf))]))))
 
 (defun open-read (filepath)
   (result-reify
@@ -892,15 +898,17 @@
 (defbuiltin write-byte (byte port))
 (defbuiltin write-str (str port))
 (defbuiltin write-line (str port))
+(defbuiltin flush (port))
 
 (defun write-all (str port)
-  (result-reify
-    (let loop ([buf str])
-      (let ([bytesize-wrote (result-reflect (write-str buf port))]
-            [bytesize-rest (- (str-bytesize buf) bytesize-wrote)])
+  (let1 r (write-str str port)
+    (if (success? r)
+      (let ([bytesize-wrote (result r)]
+            [bytesize-rest (- (str-bytesize str) bytesize-wrote)])
         (if (= 0 bytesize-rest)
-          ()
-          (loop (substr buf bytesize-wrote bytesize-rest)))))))
+          (success ())
+          (write-all (substr str bytesize-wrote bytesize-rest) port)))
+      r)))
 
 (defun write-newline (port)
   (write-line "" port))
