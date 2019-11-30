@@ -20,8 +20,8 @@ x
 x
 testsuites/syntax:16
 PARSE_SUCCESS 1 1
-x1.y2:
-x1.y2:
+x1-y2!$%&*+-/:<=>?@^_~
+x1-y2!$%&*+-/:<=>?@^_~
 testsuites/syntax:19
 PARSE_SUCCESS 1 1
 the-Answer-to-the-Ultimate-Question
