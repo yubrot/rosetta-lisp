@@ -1,7 +1,8 @@
 lispboot
 ========
 
-lispboot is a general boot code used in [ocalisp](https://github.com/yubrot/ocalisp), [golisp](https://github.com/yubrot/golisp) and [scalisp](https://github.com/yubrot/scalisp).
+lispboot is a set of bootstrapping utilities for some kind of Lisp-1 implementation.
+lispboot is used in [ocalisp](https://github.com/yubrot/ocalisp), [golisp](https://github.com/yubrot/golisp), [scalisp](https://github.com/yubrot/scalisp), [fslisp](https://github.com/yubrot/fslisp) and [wonderlisp](https://github.com/yubrot/wonderlisp).
 
 ## Required syntax
 
