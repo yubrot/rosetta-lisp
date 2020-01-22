@@ -13,7 +13,7 @@ def main()
     end
   } }
 
-  build "testsuites/syntax", {
+  build "testsuites/parser", {
     input: /^> ?(.*)$/
   }, {
     [:input, :raw] => interpret["PARSE"]

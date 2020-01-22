@@ -1,152 +1,152 @@
-testsuites/syntax:1
+testsuites/parser:1
 PARSE_SUCCESS 1 1
 foo
 foo
-testsuites/syntax:4
+testsuites/parser:4
 PARSE_SUCCESS 1 1
 abc123
 abc123
-testsuites/syntax:7
+testsuites/parser:7
 PARSE_SUCCESS 1 1
 foo-bar
 foo-bar
-testsuites/syntax:10
+testsuites/parser:10
 PARSE_SUCCESS 1 1
 *foo*
 *foo*
-testsuites/syntax:13
+testsuites/parser:13
 PARSE_SUCCESS 1 1
 x
 x
-testsuites/syntax:16
+testsuites/parser:16
 PARSE_SUCCESS 1 1
 x1-y2!$%&*+-/:<=>?@^_~
 x1-y2!$%&*+-/:<=>?@^_~
-testsuites/syntax:19
+testsuites/parser:19
 PARSE_SUCCESS 1 1
 the-Answer-to-the-Ultimate-Question
 the-Answer-to-the-Ultimate-Question
-testsuites/syntax:22
+testsuites/parser:22
 PARSE_SUCCESS 1 1
 0
 0
-testsuites/syntax:25
+testsuites/parser:25
 PARSE_SUCCESS 1 1
 1234
 1234
-testsuites/syntax:28
+testsuites/parser:28
 PARSE_SUCCESS 1 1
 3.5
 3.5
-testsuites/syntax:31
+testsuites/parser:31
 PARSE_SUCCESS 1 1
 +732
 732
-testsuites/syntax:34
+testsuites/parser:34
 PARSE_SUCCESS 1 1
 -42
 -42
-testsuites/syntax:37
+testsuites/parser:37
 PARSE_SUCCESS 1 1
 13e2
 1300
-testsuites/syntax:40
+testsuites/parser:40
 PARSE_SUCCESS 1 1
 9e+1
 90
-testsuites/syntax:43
+testsuites/parser:43
 PARSE_SUCCESS 1 1
 125e-1
 12.5
-testsuites/syntax:46
+testsuites/parser:46
 PARSE_SUCCESS 1 1
 "foo"
 "foo"
-testsuites/syntax:49
+testsuites/parser:49
 PARSE_SUCCESS 1 1
 "Hello, World!"
 "Hello, World!"
-testsuites/syntax:52
+testsuites/parser:52
 PARSE_SUCCESS 1 1
 "( ) . 0 a"
 "( ) . 0 a"
-testsuites/syntax:55
+testsuites/parser:55
 PARSE_SUCCESS 1 1
 "foo\nbar"
 "foo\nbar"
-testsuites/syntax:58
+testsuites/parser:58
 PARSE_SUCCESS 2 1
 "foo
 bar"
 "foo\nbar"
-testsuites/syntax:62
+testsuites/parser:62
 PARSE_SUCCESS 1 1
 "A \" B"
 "A \" B"
-testsuites/syntax:65
+testsuites/parser:65
 PARSE_SUCCESS 1 1
 "A\t	B"
 "A\t\tB"
-testsuites/syntax:68
+testsuites/parser:68
 PARSE_SUCCESS 1 1
 "\\\\"
 "\\\\"
-testsuites/syntax:71
+testsuites/parser:71
 PARSE_SUCCESS 1 1
 ()
 ()
-testsuites/syntax:74
+testsuites/parser:74
 PARSE_SUCCESS 1 1
 []
 ()
-testsuites/syntax:77
+testsuites/parser:77
 PARSE_SUCCESS 1 1
 (foo . bar)
 (foo . bar)
-testsuites/syntax:80
+testsuites/parser:80
 PARSE_SUCCESS 1 1
 (1 2 . 3)
 (1 2 . 3)
-testsuites/syntax:83
+testsuites/parser:83
 PARSE_SUCCESS 1 1
 (a b c d)
 (a b c d)
-testsuites/syntax:86
+testsuites/parser:86
 PARSE_SUCCESS 1 1
 (foo [bar (baz)])
 (foo (bar (baz)))
-testsuites/syntax:89
+testsuites/parser:89
 PARSE_SUCCESS 1 1
 (#t #f)
 (#t #f)
-testsuites/syntax:92
+testsuites/parser:92
 PARSE_SUCCESS 1 1
 'foo
 'foo
-testsuites/syntax:95
+testsuites/parser:95
 PARSE_SUCCESS 1 1
 '(foo 123)
 '(foo 123)
-testsuites/syntax:98
+testsuites/parser:98
 PARSE_SUCCESS 1 1
 `(i ,j ,@(k l))
 `(i ,j ,@(k l))
-testsuites/syntax:101
+testsuites/parser:101
 PARSE_SUCCESS 1 1
        123      
 123
-testsuites/syntax:104
+testsuites/parser:104
 PARSE_SUCCESS 3 1
 ; hello
 ; world
 ()
 ()
-testsuites/syntax:109
+testsuites/parser:109
 PARSE_SUCCESS 2 1
 (foo ; comment
 bar) ; comment
 (foo bar)
-testsuites/syntax:113
+testsuites/parser:113
 PARSE_SUCCESS 4 1
 (this
 is
