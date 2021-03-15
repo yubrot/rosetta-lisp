@@ -375,23 +375,17 @@
 ;! -1
 
 (defmacro quasiquote ls
-  (*qq 0 (car ls)))
+  (*qq (car ls)))
 
-(defun *qq (rank x)
+(defun *qq (x)
   (if (cons? x)
     (cond
       [(= (car x) 'unquote)
-       (if (= rank 0)
-         (cadr x)
-         (list 'list (list 'quote 'unquote) (*qq (- rank 1) (cadr x))))]
+        (cadr x)]
       [(and (cons? (car x)) (= (caar x) 'unquote-splicing))
-       (if (= rank 0)
-         (list 'append (cadar x) (*qq rank (cdr x)))
-         (list 'cons (list 'list (list 'quote 'unquote-splicing) (*qq (- rank 1) (cadar x))) (*qq rank (cdr x))))]
-      [(= (car x) 'quasiquote)
-       (list 'list (list 'quote 'quasiquote) (*qq (+ rank 1) (cadr x)))]
+        (list 'append (cadar x) (*qq (cdr x)))]
       [else
-        (list 'cons (*qq rank (car x)) (*qq rank (cdr x)))])
+        (list 'cons (*qq (car x)) (*qq (cdr x)))])
     (list 'quote x)))
 
 (defun *bind? (x)
