@@ -2,6 +2,8 @@
 
 Rosetta Lisp is a set of Lisp-1 implementations that share the VM instruction set, built-in functions, and the bootstrapping code.
 
+- [Introduction article (Japanese)](https://zenn.dev/yubrot/articles/0ea5405ea53de5)
+
 ## Implementations
 
 Currently there are 6 implementations available. Each of them is implemented in different languages.
